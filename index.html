@@ -39,7 +39,7 @@
 
         <div class="form-group" id="subTitleGroup" style="display: none;">
             <label>شرح متفرقه / نام غرفه یا هزینه:</label>
-            <input type="text" id="sub_title" placeholder="مثال: گاز ارکیده، انتظامات بورس طلا، خرید کاغذ">
+            <input type="text" id="sub_title" placeholder="مثال: گاز ارکیده، انتظامات طلا">
         </div>
 
         <div class="form-group">
@@ -85,10 +85,12 @@
 
         async function submitForm() {
             const unit_id = document.getElementById('unit_id').value.trim();
-            const charge_type = document.getElementById('charge_type').value;
+            const charge_select = document.getElementById('charge_type');
+            const charge_type = charge_select.options[charge_select.selectedIndex].value;
             const sub_title = document.getElementById('sub_title').value.trim();
             const amount = document.getElementById('amount').value.trim();
-            const pay_method = document.getElementById('pay_method').value;
+            const pay_select = document.getElementById('pay_method');
+            const pay_method = pay_select.options[pay_select.selectedIndex].value;
             const rrn = document.getElementById('rrn').value.trim();
             const receipt_no = document.getElementById('receipt_no').value.trim();
             const note = document.getElementById('note').value.trim();
@@ -103,11 +105,13 @@
             const payload = {
                 unit_id: unit_id,
                 charge_type: charge_type,
+                type: charge_type,
                 sub_title: sub_title,
                 amount: parseInt(amount),
                 pay_method: pay_method,
                 rrn: rrn,
                 receipt_no: receipt_no,
+                receipt: receipt_no,
                 note: note
             };
 
