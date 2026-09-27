@@ -8,167 +8,179 @@
         :root {
             --bg: #090f11;
             --card: #121e20;
-            --card-border: #1d3336;
+            --border: #1d3336;
             --accent: #2dd4bf;
-            --accent-glow: rgba(45, 212, 191, 0.15);
             --text-main: #f0fdfa;
-            --text-muted: #72969b;
+            --text-muted: #5e8489;
+            --text-dim: #90b4b8;
             --danger: #f87171;
             --success: #4ade80;
         }
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, sans-serif; }
-        body { background: var(--bg); color: var(--text-main); margin: 0; padding: 25px 12px; min-height: 100vh; }
+        body { background: var(--bg); color: var(--text-main); margin: 0; padding: 24px 12px; min-height: 100vh; }
         .container { max-width: 900px; margin: auto; }
 
-        /* کلید سوئیچ اپل */
+        /* کلید سوئیچ اپل: بار همیشه ملایم و متن فعال پرنور */
         .switch-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 14px;
+            gap: 16px;
             margin-bottom: 25px;
-            background: #0f181a;
-            padding: 8px 18px;
+            background: #101c1e;
+            padding: 8px 20px;
             border-radius: 40px;
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
         }
-        .switch-label { font-size: 14px; font-weight: 600; color: #53757a; transition: color .3s; }
-        .switch-label.active { color: #fff; }
-        .ios-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all .25s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .switch-label.active {
+            color: #ffffff;
+            font-weight: 700;
+            text-shadow: 0 0 12px rgba(255,255,255,0.4);
+        }
+        .ios-switch { position: relative; display: inline-block; width: 48px; height: 26px; }
         .ios-switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #203336; transition: .3s; border-radius: 30px;
+            background-color: #1f3134; transition: .3s; border-radius: 30px;
         }
         .slider:before {
-            position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px;
-            background-color: white; transition: .3s; border-radius: 50%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+            position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px;
+            background-color: #e2f1f3; transition: .3s; border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-        input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(22px); }
 
         .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeIn .25s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .view-section.active { display: block; animation: fadeIn .2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .card {
             background: var(--card);
-            border: 1px solid var(--card-border);
-            border-radius: 18px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
             padding: 22px;
             margin-bottom: 20px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.35);
         }
 
-        /* ویجت روان تقویم شمسی ۳ بخشی (روز / ماه / سال) */
-        .picker-header {
+        /* دکمه باز کردن تقویم بازشو با لبه‌های خمیده */
+        .picker-container { position: relative; margin-bottom: 20px; }
+        .date-trigger-btn {
+            background: #0b1517;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 11px 18px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .date-trigger-btn:hover { border-color: var(--accent); }
+        .date-trigger-icon { color: var(--accent); font-size: 16px; }
+
+        /* پنجره شناور تقویم ماهانه */
+        .calendar-popover {
+            position: absolute;
+            top: 52px;
+            right: 0;
+            z-index: 100;
+            background: #0f1c1f;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px;
+            width: 310px;
+            box-shadow: 0 14px 40px rgba(0,0,0,0.6);
+            display: none;
+            backdrop-filter: blur(8px);
+        }
+        .calendar-popover.open { display: block; animation: popIn .2s ease-out; }
+        @keyframes popIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .cal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 18px;
-            flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
         }
-        .picker-title { font-size: 13px; color: var(--text-muted); font-weight: 600; }
-        .today-btn {
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
+        .cal-select {
+            background: #081113;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            outline: none;
         }
-        .today-btn:hover { background: var(--accent); color: #000; }
 
-        .shamsi-wheel-container {
+        /* گرید مربعی روزهای ماه */
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+        .day-cell {
+            background: #142427;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 16px;
-            padding: 12px 10px 18px;
-            border-bottom: 1px solid var(--card-border);
-            margin-bottom: 20px;
-        }
-        .wheel-col {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100px;
-        }
-        .wheel-col.wide { width: 130px; }
-        .step-arrow {
-            background: #0b1416;
-            border: 1px solid var(--card-border);
-            color: var(--text-muted);
-            width: 32px;
-            height: 30px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #d1e7ea;
             cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
-            transition: all 0.15s ease;
+            transition: all .15s;
             user-select: none;
         }
-        .step-arrow:hover {
-            color: var(--accent);
+        .day-cell:hover {
+            background: #1b3337;
             border-color: var(--accent);
-            background: #15272a;
+            color: #fff;
         }
-        .step-arrow:active { transform: scale(0.92); }
-        .wheel-value-box {
-            height: 48px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 6px 0;
-            width: 100%;
-        }
-        .wheel-val {
-            font-size: 18px;
+        .day-cell.selected {
+            background: var(--accent);
+            color: #061214;
             font-weight: 800;
-            color: var(--accent);
-            transition: all 0.18s ease;
-        }
-        .wheel-label {
-            font-size: 10px;
-            color: #517176;
-            margin-top: 1px;
-            text-transform: uppercase;
-        }
-        .wheel-divider {
-            color: #274246;
-            font-size: 20px;
-            margin-top: 5px;
-            user-select: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(45, 212, 191, 0.4);
         }
 
-        /* کارت‌های تجمیعی */
+        /* کارت‌های آماری */
         .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 20px; }
         .stat-box {
             background: #0b1517;
-            border: 1px solid var(--card-border);
+            border: 1px solid var(--border);
             padding: 14px;
-            border-radius: 12px;
+            border-radius: 14px;
             text-align: center;
         }
-        .stat-title { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+        .stat-title { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
         .stat-value { font-size: 18px; font-weight: 800; color: #fff; }
 
-        /* جدول گزارش روز */
-        .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--card-border); }
+        /* جدول واکنش‌گرا */
+        .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: right; background: #0c1719; }
-        th { background: #132427; color: var(--text-muted); padding: 11px 9px; font-weight: 600; border-bottom: 1px solid var(--card-border); white-space: nowrap; }
+        th { background: #132427; color: var(--text-dim); padding: 11px 9px; font-weight: 600; border-bottom: 1px solid var(--border); white-space: nowrap; }
         td { padding: 11px 9px; border-bottom: 1px solid #14282b; color: #d0e4e6; white-space: nowrap; }
         tr:last-child td { border-bottom: none; }
         tr:hover { background: #102124; }
@@ -176,91 +188,65 @@
         .search-input {
             width: 100%;
             background: #091314;
-            border: 1px solid var(--card-border);
+            border: 1px solid var(--border);
             color: #fff;
             padding: 12px 16px;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 14px;
             outline: none;
         }
         .search-input:focus { border-color: var(--accent); }
-        .empty-state { text-align: center; color: #517176; padding: 32px 10px; font-size: 13px; }
-        #loading { text-align: center; padding: 50px 20px; font-size: 14px; color: var(--text-muted); }
+        .empty-state { text-align: center; color: var(--text-muted); padding: 34px 10px; font-size: 13px; }
+        #loading { text-align: center; padding: 50px 20px; font-size: 14px; color: var(--text-dim); }
     </style>
 </head>
 <body>
     <div class="container">
         
-        <!-- سوئیچ بالا به سبک اپل -->
+        <!-- سوئیچ بالا: نوار بدون تغییر رنگ و متن فعال درخشان -->
         <div class="switch-wrapper">
-            <span class="switch-label active" id="label-acc">گزارش روزانه حسابداری</span>
+            <span class="switch-label active" id="label-acc" onclick="setMode(false)">گزارش حسابداری</span>
             <label class="ios-switch">
-                <input type="checkbox" id="modeSwitch" onchange="switchMode()">
+                <input type="checkbox" id="modeSwitch" onchange="applyMode()">
                 <span class="slider"></span>
             </label>
-            <span class="switch-label" id="label-mgr">مرور مدیریتی پلاک</span>
+            <span class="switch-label" id="label-mgr" onclick="setMode(true)">مرور مدیریتی</span>
         </div>
 
         <div id="loading">در حال بارگذاری تراکنش‌ها از شیت...</div>
 
         <div id="content" style="display: none;">
             
-            <!-- تب حسابداری با ویجت روان تاریخ شمسی -->
+            <!-- نمای حسابداری -->
             <div id="accView" class="view-section active">
                 <div class="card">
                     
-                    <div class="picker-header">
-                        <div class="picker-title">انتخاب تاریخ هجری شمسی برای مغایرت‌گیری:</div>
-                        <button class="today-btn" onclick="goToLatestRecordedDate()">آخرین تاریخ ثبت‌شده</button>
+                    <!-- کنترلر بازشو تقویم هجری شمسی -->
+                    <div class="picker-container">
+                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">تاریخ گزارش روزانه:</div>
+                        <button class="date-trigger-btn" onclick="toggleCalendar()">
+                            <span class="date-trigger-icon">📅</span>
+                            <span id="selectedDateText">۱۴۰۵/۰۷/۰۶</span>
+                        </button>
+
+                        <!-- تقویم پنجره‌ای با فیلدهای ماه، سال و شبکه روزها -->
+                        <div class="calendar-popover" id="calendarPopover">
+                            <div class="cal-header">
+                                <select id="calMonthSelect" class="cal-select" onchange="renderDaysGrid()"></select>
+                                <select id="calYearSelect" class="cal-select" onchange="renderDaysGrid()"></select>
+                            </div>
+                            <div class="days-grid" id="daysGrid"></div>
+                        </div>
                     </div>
 
-                    <!-- استپر ۳ تایی روز / ماه / سال -->
-                    <div class="shamsi-wheel-container">
-                        
-                        <!-- روز -->
-                        <div class="wheel-col">
-                            <button class="step-arrow" onclick="stepDay(1)">+</button>
-                            <div class="wheel-value-box">
-                                <span class="wheel-val" id="dayDisplay">۰۱</span>
-                                <span class="wheel-label">روز</span>
-                            </div>
-                            <button class="step-arrow" onclick="stepDay(-1)">−</button>
-                        </div>
-
-                        <div class="wheel-divider">/</div>
-
-                        <!-- ماه -->
-                        <div class="wheel-col wide">
-                            <button class="step-arrow" onclick="stepMonth(1)">+</button>
-                            <div class="wheel-value-box">
-                                <span class="wheel-val" id="monthDisplay">فروردین</span>
-                                <span class="wheel-label">ماه</span>
-                            </div>
-                            <button class="step-arrow" onclick="stepMonth(-1)">−</button>
-                        </div>
-
-                        <div class="wheel-divider">/</div>
-
-                        <!-- سال -->
-                        <div class="wheel-col">
-                            <button class="step-arrow" onclick="stepYear(1)">+</button>
-                            <div class="wheel-value-box">
-                                <span class="wheel-val" id="yearDisplay">۱۴۰۵</span>
-                                <span class="wheel-label">سال</span>
-                            </div>
-                            <button class="step-arrow" onclick="stepYear(-1)">−</button>
-                        </div>
-
-                    </div>
-
-                    <!-- کارت‌های تجمیعی پوز و شبا -->
+                    <!-- کارت‌های ۳ گانه ارقام روز -->
                     <div class="stat-grid">
                         <div class="stat-box">
-                            <div class="stat-title">جمع کارتخوان (POS) این تاریخ</div>
+                            <div class="stat-title">جمع کارتخوان (POS) روز</div>
                             <div class="stat-value" id="todayPos" style="color: var(--accent);">۰ تومان</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-title">جمع واریز شبا این تاریخ</div>
+                            <div class="stat-title">جمع واریز شبا روز</div>
                             <div class="stat-value" id="todayShaba" style="color: #67e8f9;">۰ تومان</div>
                         </div>
                         <div class="stat-box">
@@ -269,7 +255,7 @@
                         </div>
                     </div>
 
-                    <!-- جدول تراکنش‌های روز انتخاب‌شده -->
+                    <!-- جدول فیش‌های همان روز -->
                     <div class="table-wrap">
                         <table>
                             <thead>
@@ -289,10 +275,10 @@
                 </div>
             </div>
 
-            <!-- تب مرور مدیریتی پلاک -->
+            <!-- نمای مدیریت واحد -->
             <div id="mgrView" class="view-section">
                 <div class="card">
-                    <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 8px;">جست‌وجوی پلاک واحد:</label>
+                    <label style="font-size: 13px; color: var(--text-dim); display: block; margin-bottom: 8px;">جست‌وجوی پلاک واحد:</label>
                     <input type="text" id="unitSearch" class="search-input" placeholder="مثلاً: 110 یا 240 یا A-14..." oninput="searchUnit()">
                     
                     <div id="unitResult" style="margin-top: 20px; display: none;">
@@ -315,7 +301,7 @@
                             </div>
                         </div>
 
-                        <div style="font-size: 13px; color: var(--text-muted); margin: 18px 4px 8px;">ریز پرداخت‌های ثبت‌شده این پلاک:</div>
+                        <div style="font-size: 13px; color: var(--text-dim); margin: 18px 4px 8px;">ریز پرداخت‌های ثبت‌شده این پلاک:</div>
                         <div class="table-wrap">
                             <table>
                                 <thead>
@@ -349,12 +335,11 @@
             "دی", "بهمن", "اسفند"
         ];
 
-        // تاریخ انتخابی فعلی
-        let selYear = 1405;
-        let selMonth = 7; // مهر
-        let selDay = 6;
+        let selectedY = 1405;
+        let selectedM = 7;
+        let selectedD = 6;
 
-        function toEnglishDigits(str) {
+        function toEn(str) {
             if (!str) return '';
             return str.toString()
                 .replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d))
@@ -362,30 +347,30 @@
                 .trim();
         }
 
-        function toPersianDigits(n) {
+        function toFa(n) {
             const p = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
             return n.toString().replace(/\d/g, d => p[d]);
         }
 
-        // استخراج و یکدست‌سازی تاریخ شمسی از رشته تب ۱
-        function normalizeTxDate(rawDate) {
-            if (!rawDate) return { fullDate: '', time: '' };
-            const clean = toEnglishDigits(rawDate.trim());
+        // استخراج مطمئن تاریخ شمسی و ساعت از رشته‌های شیت
+        function cleanTx(tx) {
+            const raw = toEn(tx.date || '');
+            let y = '', m = '', d = '', time = '';
             
-            // تطابق الگوی yyyy/mm/dd یا yyyy-mm-dd
-            const match = clean.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+            const match = raw.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
             if (match) {
-                const y = match[1];
-                const m = match[2].padStart(2, '0');
-                const d = match[3].padStart(2, '0');
-                const fullDate = `${y}/${m}/${d}`;
-                
-                // استخراج ساعت در صورت وجود
-                const timeMatch = clean.match(/(\d{1,2}:\d{2})/);
-                const time = timeMatch ? timeMatch[1] : '';
-                return { fullDate, time };
+                y = match[1];
+                m = match[2].padStart(2, '0');
+                d = match[3].padStart(2, '0');
             }
-            return { fullDate: clean.split(' ')[0], time: clean.split(' ')[1] || '' };
+            const timeMatch = raw.match(/(\d{1,2}:\d{2})/);
+            if (timeMatch) time = timeMatch[1];
+
+            tx.fullDate = (y && m && d) ? `${y}/${m}/${d}` : raw.split(' ')[0];
+            tx.time = time;
+            tx.y = parseInt(y, 10) || 0;
+            tx.m = parseInt(m, 10) || 0;
+            tx.d = parseInt(d, 10) || 0;
         }
 
         async function fetchData() {
@@ -393,23 +378,35 @@
                 const res = await fetch(API_URL);
                 RAW_DATA = await res.json();
 
-                (RAW_DATA.transactions || []).forEach(tx => {
-                    const norm = normalizeTxDate(tx.date);
-                    tx.normDate = norm.fullDate;
-                    tx.normTime = norm.time;
-                });
+                (RAW_DATA.transactions || []).forEach(cleanTx);
+
+                // تعیین آخرین تاریخ موجود در دیتابیس به عنوان پیش‌فرض
+                const validTxs = (RAW_DATA.transactions || []).filter(t => t.y > 1300);
+                if (validTxs.length > 0) {
+                    const last = validTxs[validTxs.length - 1];
+                    selectedY = last.y;
+                    selectedM = last.m;
+                    selectedD = last.d;
+                }
+
+                initCalendarDropdowns();
+                updateCalendarUI();
 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
-
-                goToLatestRecordedDate();
             } catch (e) {
-                document.getElementById('loading').innerText = "خطا در اتصال به گوگل شیت یا بارگذاری داده‌ها.";
+                document.getElementById('loading').innerText = "خطا در دریافت اطلاعات از سرور.";
                 console.error(e);
             }
         }
 
-        function switchMode() {
+        // ناوبری سوئیچ
+        function setMode(isMgr) {
+            document.getElementById('modeSwitch').checked = isMgr;
+            applyMode();
+        }
+
+        function applyMode() {
             const isMgr = document.getElementById('modeSwitch').checked;
             document.getElementById('accView').classList.toggle('active', !isMgr);
             document.getElementById('mgrView').classList.toggle('active', isMgr);
@@ -417,63 +414,82 @@
             document.getElementById('label-mgr').classList.toggle('active', isMgr);
         }
 
-        // عملیات افزایش و کاهش روز، ماه و سال
-        function stepDay(delta) {
-            selDay += delta;
-            if (selDay > 31) selDay = 1;
-            if (selDay < 1) selDay = 31;
-            updatePickerAndFilter();
-        }
+        // تنظیمات تقویم شناور
+        function initCalendarDropdowns() {
+            const mSel = document.getElementById('calMonthSelect');
+            mSel.innerHTML = '';
+            SHAMSI_MONTHS.forEach((name, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx + 1;
+                opt.innerText = name;
+                if (idx + 1 === selectedM) opt.selected = true;
+                mSel.appendChild(opt);
+            });
 
-        function stepMonth(delta) {
-            selMonth += delta;
-            if (selMonth > 12) selMonth = 1;
-            if (selMonth < 1) selMonth = 12;
-            updatePickerAndFilter();
-        }
-
-        function stepYear(delta) {
-            selYear += delta;
-            updatePickerAndFilter();
-        }
-
-        function goToLatestRecordedDate() {
-            if (!RAW_DATA || !RAW_DATA.transactions || RAW_DATA.transactions.length === 0) {
-                updatePickerAndFilter();
-                return;
+            const ySel = document.getElementById('calYearSelect');
+            ySel.innerHTML = '';
+            for (let y = 1403; y <= 1408; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.innerText = toFa(y);
+                if (y === selectedY) opt.selected = true;
+                ySel.appendChild(opt);
             }
-            // پیدا کردن آخرین تاریخ ثبت‌شده
-            const validDates = RAW_DATA.transactions
-                .map(t => t.normDate)
-                .filter(Boolean)
-                .sort();
-
-            if (validDates.length > 0) {
-                const latest = validDates[validDates.length - 1]; // مثلا "1405/07/06"
-                const parts = latest.split('/');
-                selYear = parseInt(parts[0], 10);
-                selMonth = parseInt(parts[1], 10);
-                selDay = parseInt(parts[2], 10);
-            }
-            updatePickerAndFilter();
         }
 
-        function updatePickerAndFilter() {
-            // به‌روزرسانی نمایشگر مینیمال
-            document.getElementById('dayDisplay').innerText = toPersianDigits(selDay.toString().padStart(2, '0'));
-            document.getElementById('monthDisplay').innerText = SHAMSI_MONTHS[selMonth - 1];
-            document.getElementById('yearDisplay').innerText = toPersianDigits(selYear);
+        function toggleCalendar() {
+            const pop = document.getElementById('calendarPopover');
+            pop.classList.toggle('open');
+            if (pop.classList.contains('open')) renderDaysGrid();
+        }
 
-            // رشته استاندارد تاریخ فیلتر: yyyy/mm/dd
-            const mStr = selMonth.toString().padStart(2, '0');
-            const dStr = selDay.toString().padStart(2, '0');
-            const targetFilterDate = `${selYear}/${mStr}/${dStr}`;
+        // بستن تقویم با کلیک بیرون از آن
+        document.addEventListener('click', function(e) {
+            const pop = document.getElementById('calendarPopover');
+            const trigger = document.querySelector('.date-trigger-btn');
+            if (!pop.contains(e.target) && !trigger.contains(e.target)) {
+                pop.classList.remove('open');
+            }
+        });
 
-            renderDailyReport(targetFilterDate);
+        function renderDaysGrid() {
+            const m = parseInt(document.getElementById('calMonthSelect').value, 10);
+            const y = parseInt(document.getElementById('calYearSelect').value, 10);
+            const grid = document.getElementById('daysGrid');
+            grid.innerHTML = '';
+
+            const totalDays = (m <= 6) ? 31 : (m <= 11 ? 30 : 29);
+
+            for (let d = 1; d <= totalDays; d++) {
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+                if (d === selectedD && m === selectedM && y === selectedY) {
+                    cell.classList.add('selected');
+                }
+                cell.innerText = toFa(d);
+                cell.onclick = () => {
+                    selectedY = y;
+                    selectedM = m;
+                    selectedD = d;
+                    document.getElementById('calendarPopover').classList.remove('open');
+                    updateCalendarUI();
+                };
+                grid.appendChild(cell);
+            }
+        }
+
+        function updateCalendarUI() {
+            const mStr = selectedM.toString().padStart(2, '0');
+            const dStr = selectedD.toString().padStart(2, '0');
+            const dateStr = `${selectedY}/${mStr}/${dStr}`;
+            
+            document.getElementById('selectedDateText').innerText = `${toFa(selectedD)} ${SHAMSI_MONTHS[selectedM - 1]} ${toFa(selectedY)}`;
+
+            renderDailyReport(dateStr);
         }
 
         function renderDailyReport(targetDate) {
-            const filtered = (RAW_DATA.transactions || []).filter(t => t.normDate === targetDate);
+            const filtered = (RAW_DATA.transactions || []).filter(t => t.fullDate === targetDate);
             
             let posSum = 0;
             let shabaSum = 0;
@@ -481,7 +497,7 @@
             tbody.innerHTML = '';
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">هیچ رکوردی برای تاریخ ${toPersianDigits(targetDate)} ثبت نشده است.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">هیچ رکوردی برای تاریخ ${toFa(targetDate)} ثبت نشده است.</td></tr>`;
                 document.getElementById('todayPos').innerText = '۰ تومان';
                 document.getElementById('todayShaba').innerText = '۰ تومان';
                 document.getElementById('todayCount').innerText = '۰ عدد';
@@ -500,7 +516,7 @@
                 const desc = t.sub ? `${t.type} (${t.sub})` : t.type;
                 tbody.innerHTML += `
                     <tr>
-                        <td style="color:#72969b;">${t.normTime || '-'}</td>
+                        <td style="color:var(--text-dim);">${t.time || '-'}</td>
                         <td style="font-weight:700; color:#fff;">${t.unit}</td>
                         <td>${desc}</td>
                         <td style="font-weight:700; color:var(--accent);">${amt.toLocaleString('fa-IR')}</td>
@@ -528,12 +544,12 @@
                 return;
             }
 
-            const queryEn = toEnglishDigits(rawQuery).toLowerCase();
+            const queryEn = toEn(rawQuery).toLowerCase();
 
             let info = null;
             if (RAW_DATA.ledgers) {
                 for (const [key, val] of Object.entries(RAW_DATA.ledgers)) {
-                    if (toEnglishDigits(key).toLowerCase() === queryEn) {
+                    if (toEn(key).toLowerCase() === queryEn) {
                         info = val;
                         break;
                     }
@@ -541,7 +557,7 @@
             }
 
             const unitTx = (RAW_DATA.transactions || []).filter(t => 
-                toEnglishDigits(t.unit).toLowerCase() === queryEn
+                toEn(t.unit).toLowerCase() === queryEn
             );
 
             if (!info && unitTx.length === 0) {
