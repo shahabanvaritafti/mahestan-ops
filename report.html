@@ -488,21 +488,61 @@
             renderDailyReport(dateStr);
         }
 
-        function renderDailyReport(targetDate) {
-            const filtered = (RAW_DATA.transactions || []).filter(t => t.fullDate === targetDate);
-            
-            let posSum = 0;
-            let shabaSum = 0;
-            const tbody = document.getElementById('dailyTableBody');
-            tbody.innerHTML = '';
+       function renderDailyReport(targetDate) {
+    // تبدیل تاریخ انتخابی به ارقام انگلیسی یکدست: مثلا "1405/07/06"
+    const targetEn = toEn(targetDate).trim();
+    
+    // فیلتر هوشمند: بررسی می‌کند آیا سلول تاریخ با این تاریخ شروع می‌شود یا نه
+    const filtered = (RAW_DATA.transactions || []).filter(t => {
+        const rawCell = toEn(t.date || '').trim();
+        // هم حالت startsWith و هم حالت وجود داشتن در ابتدای متن را پوشش می‌دهد
+        return rawCell.startsWith(targetEn) || rawCell.includes(targetEn);
+    });
+    
+    let posSum = 0;
+    let shabaSum = 0;
+    const tbody = document.getElementById('dailyTableBody');
+    tbody.innerHTML = '';
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">هیچ رکوردی برای تاریخ ${toFa(targetDate)} ثبت نشده است.</td></tr>`;
-                document.getElementById('todayPos').innerText = '۰ تومان';
-                document.getElementById('todayShaba').innerText = '۰ تومان';
-                document.getElementById('todayCount').innerText = '۰ عدد';
-                return;
-            }
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-state">هیچ رکوردی برای تاریخ ${toFa(targetDate)} ثبت نشده است.</td></tr>`;
+        document.getElementById('todayPos').innerText = '۰ تومان';
+        document.getElementById('todayShaba').innerText = '۰ تومان';
+        document.getElementById('todayCount').innerText = '۰ عدد';
+        return;
+    }
+
+    filtered.forEach(t => {
+        const methodStr = String(t.method || '');
+        const amt = Number(t.amount || 0);
+        if (methodStr.includes('کارتخوان') || methodStr.includes('POS')) {
+            posSum += amt;
+        } else {
+            shabaSum += amt;
+        }
+
+        // استخراج دقیق ساعت از انتهای همان سلول (مثلا 14:35)
+        const timeMatch = toEn(t.date || '').match(/(\d{1,2}:\d{2})/);
+        const displayTime = timeMatch ? toFa(timeMatch[1]) : '-';
+
+        const desc = t.sub ? `${t.type} (${t.sub})` : t.type;
+        tbody.innerHTML += `
+            <tr>
+                <td style="color:var(--text-dim);">${displayTime}</td>
+                <td style="font-weight:700; color:#fff;">${t.unit}</td>
+                <td>${desc}</td>
+                <td style="font-weight:700; color:var(--accent);">${amt.toLocaleString('fa-IR')}</td>
+                <td>${t.method}</td>
+                <td><small style="letter-spacing:0.5px;">${t.rrn}</small></td>
+                <td>${t.receipt || '-'}</td>
+            </tr>
+        `;
+    });
+
+    document.getElementById('todayPos').innerText = posSum.toLocaleString('fa-IR') + ' تومان';
+    document.getElementById('todayShaba').innerText = shabaSum.toLocaleString('fa-IR') + ' تومان';
+    document.getElementById('todayCount').innerText = filtered.length.toLocaleString('fa-IR') + ' عدد';
+}
 
             filtered.forEach(t => {
                 const methodStr = String(t.method || '');
