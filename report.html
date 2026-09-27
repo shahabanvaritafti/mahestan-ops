@@ -6,20 +6,19 @@
     <title>داشبورد گزارشات مهستان</title>
     <style>
         :root {
-            --bg-color: #0b1416;
-            --card-bg: #122124;
-            --card-border: #1f393d;
+            --bg: #090f11;
+            --card: #121e20;
+            --card-border: #1d3336;
             --accent: #2dd4bf;
             --accent-glow: rgba(45, 212, 191, 0.15);
             --text-main: #f0fdfa;
-            --text-muted: #99f6e4;
-            --text-dim: #5eead4;
+            --text-muted: #72969b;
             --danger: #f87171;
             --success: #4ade80;
         }
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, 'B Nazanin', sans-serif; }
-        body { background: var(--bg-color); color: var(--text-main); margin: 0; padding: 25px 14px; min-height: 100vh; }
-        .container { max-width: 940px; margin: auto; }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, sans-serif; }
+        body { background: var(--bg); color: var(--text-main); margin: 0; padding: 25px 12px; min-height: 100vh; }
+        .container { max-width: 900px; margin: auto; }
 
         /* کلید سوئیچ اپل */
         .switch-wrapper {
@@ -27,202 +26,250 @@
             align-items: center;
             justify-content: center;
             gap: 14px;
-            margin-bottom: 28px;
-            background: #0f1c1e;
+            margin-bottom: 25px;
+            background: #0f181a;
             padding: 8px 18px;
             border-radius: 40px;
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
             border: 1px solid var(--card-border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
-        .switch-label { font-size: 14px; font-weight: 600; color: #5c7f84; transition: color .3s; }
+        .switch-label { font-size: 14px; font-weight: 600; color: #53757a; transition: color .3s; }
         .switch-label.active { color: #fff; }
         .ios-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .ios-switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #26383b; transition: .3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 30px;
+            background-color: #203336; transition: .3s; border-radius: 30px;
         }
         .slider:before {
             position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px;
-            background-color: white; transition: .3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+            background-color: white; transition: .3s; border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
         }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(22px); }
 
         .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeIn .35s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .view-section.active { display: block; animation: fadeIn .25s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* کارت اصلی */
         .card {
-            background: var(--card-bg);
+            background: var(--card);
             border: 1px solid var(--card-border);
             border-radius: 18px;
             padding: 22px;
             margin-bottom: 20px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.35);
         }
 
-        /* ویجت روان انتخاب تاریخ به سبک اپل */
-        .date-picker-wrapper {
+        /* ویجت روان تقویم شمسی ۳ بخشی (روز / ماه / سال) */
+        .picker-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 18px;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--card-border);
+            gap: 10px;
         }
-        .picker-title { font-size: 13px; color: #7e9ea3; font-weight: 500; }
-        
-        .apple-stepper {
-            display: inline-flex;
+        .picker-title { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+        .today-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .today-btn:hover { background: var(--accent); color: #000; }
+
+        .shamsi-wheel-container {
+            display: flex;
             align-items: center;
-            background: #091314;
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 4px;
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+            justify-content: center;
+            gap: 16px;
+            padding: 12px 10px 18px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 20px;
         }
-        .stepper-btn {
-            background: #152528;
+        .wheel-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100px;
+        }
+        .wheel-col.wide { width: 130px; }
+        .step-arrow {
+            background: #0b1416;
             border: 1px solid var(--card-border);
-            color: var(--text-main);
-            width: 38px;
-            height: 38px;
-            border-radius: 9px;
+            color: var(--text-muted);
+            width: 32px;
+            height: 30px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 15px;
             font-weight: bold;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             user-select: none;
         }
-        .stepper-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
-        .stepper-btn:active { transform: scale(0.92); }
-        .stepper-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
-        
-        .date-display-box {
-            min-width: 150px;
-            text-align: center;
-            padding: 0 16px;
-            position: relative;
-        }
-        .date-val {
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+        .step-arrow:hover {
             color: var(--accent);
-            display: inline-block;
-            transition: transform 0.2s, opacity 0.2s;
+            border-color: var(--accent);
+            background: #15272a;
         }
-        .date-sub {
-            font-size: 11px;
-            color: #6d8e93;
-            display: block;
-            margin-top: 2px;
+        .step-arrow:active { transform: scale(0.92); }
+        .wheel-value-box {
+            height: 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 6px 0;
+            width: 100%;
+        }
+        .wheel-val {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent);
+            transition: all 0.18s ease;
+        }
+        .wheel-label {
+            font-size: 10px;
+            color: #517176;
+            margin-top: 1px;
+            text-transform: uppercase;
+        }
+        .wheel-divider {
+            color: #274246;
+            font-size: 20px;
+            margin-top: 5px;
+            user-select: none;
         }
 
-        /* کارت‌های آمار ۳ گانه */
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        /* کارت‌های تجمیعی */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 20px; }
         .stat-box {
-            background: #0b1618;
+            background: #0b1517;
             border: 1px solid var(--card-border);
-            padding: 16px 14px;
-            border-radius: 14px;
+            padding: 14px;
+            border-radius: 12px;
             text-align: center;
-            transition: transform 0.2s;
         }
-        .stat-title { font-size: 12px; color: #7e9ea3; margin-bottom: 6px; }
-        .stat-value { font-size: 19px; font-weight: 800; color: #fff; }
+        .stat-title { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+        .stat-value { font-size: 18px; font-weight: 800; color: #fff; }
 
-        /* جدول واکنش‌گرا */
-        .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--card-border); }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: right; background: #0c181a; }
-        th { background: #132427; color: #8faeb3; padding: 12px 10px; font-weight: 600; border-bottom: 1px solid var(--card-border); }
-        td { padding: 12px 10px; border-bottom: 1px solid #14282b; color: #d4e7e9; }
+        /* جدول گزارش روز */
+        .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--card-border); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: right; background: #0c1719; }
+        th { background: #132427; color: var(--text-muted); padding: 11px 9px; font-weight: 600; border-bottom: 1px solid var(--card-border); white-space: nowrap; }
+        td { padding: 11px 9px; border-bottom: 1px solid #14282b; color: #d0e4e6; white-space: nowrap; }
         tr:last-child td { border-bottom: none; }
-        tr:hover { background: #112225; }
+        tr:hover { background: #102124; }
 
-        /* بخش جستجوی مدیریت */
         .search-input {
             width: 100%;
             background: #091314;
             border: 1px solid var(--card-border);
             color: #fff;
-            padding: 13px 16px;
-            border-radius: 12px;
-            font-size: 15px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
             outline: none;
-            transition: border-color .2s;
         }
-        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-
-        #loading { text-align: center; padding: 50px 20px; font-size: 15px; color: #7e9ea3; }
-        .empty-state { text-align: center; color: #5f7f84; padding: 35px 15px; font-size: 13px; }
+        .search-input:focus { border-color: var(--accent); }
+        .empty-state { text-align: center; color: #517176; padding: 32px 10px; font-size: 13px; }
+        #loading { text-align: center; padding: 50px 20px; font-size: 14px; color: var(--text-muted); }
     </style>
 </head>
 <body>
     <div class="container">
         
-        <!-- سوئیچ بالایی سبک اپل -->
+        <!-- سوئیچ بالا به سبک اپل -->
         <div class="switch-wrapper">
-            <span class="switch-label active" id="label-acc">گزارش حسابداری</span>
+            <span class="switch-label active" id="label-acc">گزارش روزانه حسابداری</span>
             <label class="ios-switch">
                 <input type="checkbox" id="modeSwitch" onchange="switchMode()">
                 <span class="slider"></span>
             </label>
-            <span class="switch-label" id="label-mgr">مرور مدیریتی</span>
+            <span class="switch-label" id="label-mgr">مرور مدیریتی پلاک</span>
         </div>
 
-        <div id="loading">در حال برقراری اتصال به گوگل شیت و دریافت دیتابیس...</div>
+        <div id="loading">در حال بارگذاری تراکنش‌ها از شیت...</div>
 
         <div id="content" style="display: none;">
             
-            <!-- تب ۱: گزارش حسابداری روزانه -->
+            <!-- تب حسابداری با ویجت روان تاریخ شمسی -->
             <div id="accView" class="view-section active">
                 <div class="card">
                     
-                    <!-- کنترلر تاریخ روان با کلید منفی و مثبت -->
-                    <div class="date-picker-wrapper">
-                        <div>
-                            <div class="picker-title">گزارش روزانه تجمیعی کارتخوان و شبا</div>
-                        </div>
-                        
-                        <div class="apple-stepper">
-                            <button class="stepper-btn" id="btnPrevDate" onclick="changeDateIndex(-1)" title="روز قبل">−</button>
-                            <div class="date-display-box">
-                                <span class="date-val" id="currentDateLabel">---</span>
-                                <span class="date-sub" id="currentDateSub">انتخاب روز</span>
-                            </div>
-                            <button class="stepper-btn" id="btnNextDate" onclick="changeDateIndex(1)" title="روز بعد">+</button>
-                        </div>
+                    <div class="picker-header">
+                        <div class="picker-title">انتخاب تاریخ هجری شمسی برای مغایرت‌گیری:</div>
+                        <button class="today-btn" onclick="goToLatestRecordedDate()">آخرین تاریخ ثبت‌شده</button>
                     </div>
 
-                    <!-- باکس‌های جمع مبالغ -->
+                    <!-- استپر ۳ تایی روز / ماه / سال -->
+                    <div class="shamsi-wheel-container">
+                        
+                        <!-- روز -->
+                        <div class="wheel-col">
+                            <button class="step-arrow" onclick="stepDay(1)">+</button>
+                            <div class="wheel-value-box">
+                                <span class="wheel-val" id="dayDisplay">۰۱</span>
+                                <span class="wheel-label">روز</span>
+                            </div>
+                            <button class="step-arrow" onclick="stepDay(-1)">−</button>
+                        </div>
+
+                        <div class="wheel-divider">/</div>
+
+                        <!-- ماه -->
+                        <div class="wheel-col wide">
+                            <button class="step-arrow" onclick="stepMonth(1)">+</button>
+                            <div class="wheel-value-box">
+                                <span class="wheel-val" id="monthDisplay">فروردین</span>
+                                <span class="wheel-label">ماه</span>
+                            </div>
+                            <button class="step-arrow" onclick="stepMonth(-1)">−</button>
+                        </div>
+
+                        <div class="wheel-divider">/</div>
+
+                        <!-- سال -->
+                        <div class="wheel-col">
+                            <button class="step-arrow" onclick="stepYear(1)">+</button>
+                            <div class="wheel-value-box">
+                                <span class="wheel-val" id="yearDisplay">۱۴۰۵</span>
+                                <span class="wheel-label">سال</span>
+                            </div>
+                            <button class="step-arrow" onclick="stepYear(-1)">−</button>
+                        </div>
+
+                    </div>
+
+                    <!-- کارت‌های تجمیعی پوز و شبا -->
                     <div class="stat-grid">
                         <div class="stat-box">
-                            <div class="stat-title">جمع کارتخوان (POS) روز</div>
+                            <div class="stat-title">جمع کارتخوان (POS) این تاریخ</div>
                             <div class="stat-value" id="todayPos" style="color: var(--accent);">۰ تومان</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-title">جمع انتقال شبا / ساتنا</div>
+                            <div class="stat-title">جمع واریز شبا این تاریخ</div>
                             <div class="stat-value" id="todayShaba" style="color: #67e8f9;">۰ تومان</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-title">تعداد کل فیش‌های روز</div>
+                            <div class="stat-title">تعداد کل فیش‌ها</div>
                             <div class="stat-value" id="todayCount">۰ عدد</div>
                         </div>
                     </div>
 
-                    <!-- لیست جدول فیش‌های همان روز -->
+                    <!-- جدول تراکنش‌های روز انتخاب‌شده -->
                     <div class="table-wrap">
                         <table>
                             <thead>
@@ -231,7 +278,7 @@
                                     <th>پلاک</th>
                                     <th>نوع شارژ / شرح</th>
                                     <th>مبلغ (تومان)</th>
-                                    <th>روش</th>
+                                    <th>روش پرداخت</th>
                                     <th>پیگیری شاپرک</th>
                                     <th>قبض</th>
                                 </tr>
@@ -242,13 +289,13 @@
                 </div>
             </div>
 
-            <!-- تب ۲: مرور سریع مدیریت -->
+            <!-- تب مرور مدیریتی پلاک -->
             <div id="mgrView" class="view-section">
                 <div class="card">
-                    <label style="font-size: 13px; color: #7e9ea3; display: block; margin-bottom: 8px;">جست‌وجوی پلاک واحد:</label>
+                    <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 8px;">جست‌وجوی پلاک واحد:</label>
                     <input type="text" id="unitSearch" class="search-input" placeholder="مثلاً: 110 یا 240 یا A-14..." oninput="searchUnit()">
                     
-                    <div id="unitResult" style="margin-top: 22px; display: none;">
+                    <div id="unitResult" style="margin-top: 20px; display: none;">
                         <div class="stat-grid">
                             <div class="stat-box">
                                 <div class="stat-title">نام فروشگاه</div>
@@ -268,7 +315,7 @@
                             </div>
                         </div>
 
-                        <div style="font-size: 13px; color: #7e9ea3; margin: 18px 4px 8px;">سوابق پرداخت‌های ثبت‌شده برای این واحد:</div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin: 18px 4px 8px;">ریز پرداخت‌های ثبت‌شده این پلاک:</div>
                         <div class="table-wrap">
                             <table>
                                 <thead>
@@ -294,8 +341,18 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxvRvMICYcbtkWAQVJ1a8InqZyFUpwzOfIg4KsdfJd0bA9wT2q81McNBmsyyoeaAc19qA/exec";
         let RAW_DATA = null;
-        let UNIQUE_DATES = [];
-        let CURRENT_DATE_INDEX = 0;
+
+        const SHAMSI_MONTHS = [
+            "فروردین", "اردیبهشت", "خرداد",
+            "تیر", "مرداد", "شهریور",
+            "مهر", "آبان", "آذر",
+            "دی", "بهمن", "اسفند"
+        ];
+
+        // تاریخ انتخابی فعلی
+        let selYear = 1405;
+        let selMonth = 7; // مهر
+        let selDay = 6;
 
         function toEnglishDigits(str) {
             if (!str) return '';
@@ -305,41 +362,47 @@
                 .trim();
         }
 
-        // تمیزکاری و استخراج تاریخ شمسی
-        function parseJalali(dateStr) {
-            if (!dateStr) return { d: '', t: '' };
-            let clean = dateStr.trim();
-            // اگر خروجی به شکل فرمت تاریخ آبجکت میلادی آمده باشد آن را کنترل می‌کنیم
-            let parts = clean.split(' ');
-            let d = parts[0] || '';
-            let t = parts[1] || '';
-            return { d, t };
+        function toPersianDigits(n) {
+            const p = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+            return n.toString().replace(/\d/g, d => p[d]);
+        }
+
+        // استخراج و یکدست‌سازی تاریخ شمسی از رشته تب ۱
+        function normalizeTxDate(rawDate) {
+            if (!rawDate) return { fullDate: '', time: '' };
+            const clean = toEnglishDigits(rawDate.trim());
+            
+            // تطابق الگوی yyyy/mm/dd یا yyyy-mm-dd
+            const match = clean.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+            if (match) {
+                const y = match[1];
+                const m = match[2].padStart(2, '0');
+                const d = match[3].padStart(2, '0');
+                const fullDate = `${y}/${m}/${d}`;
+                
+                // استخراج ساعت در صورت وجود
+                const timeMatch = clean.match(/(\d{1,2}:\d{2})/);
+                const time = timeMatch ? timeMatch[1] : '';
+                return { fullDate, time };
+            }
+            return { fullDate: clean.split(' ')[0], time: clean.split(' ')[1] || '' };
         }
 
         async function fetchData() {
             try {
                 const res = await fetch(API_URL);
                 RAW_DATA = await res.json();
-                
-                // مرتب‌سازی تراکنش‌ها
-                (RAW_DATA.transactions || []).forEach(tx => {
-                    const parsed = parseJalali(tx.date);
-                    tx.pureDate = parsed.d;
-                    tx.pureTime = parsed.t;
-                });
 
-                // استخراج تاریخ‌های یکتا به ترتیب جدیدترین
-                const dateSet = new Set();
-                RAW_DATA.transactions.forEach(tx => {
-                    if (tx.pureDate) dateSet.add(tx.pureDate);
+                (RAW_DATA.transactions || []).forEach(tx => {
+                    const norm = normalizeTxDate(tx.date);
+                    tx.normDate = norm.fullDate;
+                    tx.normTime = norm.time;
                 });
-                UNIQUE_DATES = Array.from(dateSet).sort().reverse();
 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
 
-                CURRENT_DATE_INDEX = 0;
-                updateDateStepper();
+                goToLatestRecordedDate();
             } catch (e) {
                 document.getElementById('loading').innerText = "خطا در اتصال به گوگل شیت یا بارگذاری داده‌ها.";
                 console.error(e);
@@ -354,35 +417,63 @@
             document.getElementById('label-mgr').classList.toggle('active', isMgr);
         }
 
-        function changeDateIndex(delta) {
-            const newIndex = CURRENT_DATE_INDEX - delta; // دکمه مثبت (+) به روز جدیدتر و منفی (-) به روز قبل‌تر می‌رود
-            if (newIndex >= 0 && newIndex < UNIQUE_DATES.length) {
-                CURRENT_DATE_INDEX = newIndex;
-                updateDateStepper();
-            }
+        // عملیات افزایش و کاهش روز، ماه و سال
+        function stepDay(delta) {
+            selDay += delta;
+            if (selDay > 31) selDay = 1;
+            if (selDay < 1) selDay = 31;
+            updatePickerAndFilter();
         }
 
-        function updateDateStepper() {
-            if (UNIQUE_DATES.length === 0) {
-                document.getElementById('currentDateLabel').innerText = "بدون داده";
-                document.getElementById('btnPrevDate').disabled = true;
-                document.getElementById('btnNextDate').disabled = true;
+        function stepMonth(delta) {
+            selMonth += delta;
+            if (selMonth > 12) selMonth = 1;
+            if (selMonth < 1) selMonth = 12;
+            updatePickerAndFilter();
+        }
+
+        function stepYear(delta) {
+            selYear += delta;
+            updatePickerAndFilter();
+        }
+
+        function goToLatestRecordedDate() {
+            if (!RAW_DATA || !RAW_DATA.transactions || RAW_DATA.transactions.length === 0) {
+                updatePickerAndFilter();
                 return;
             }
+            // پیدا کردن آخرین تاریخ ثبت‌شده
+            const validDates = RAW_DATA.transactions
+                .map(t => t.normDate)
+                .filter(Boolean)
+                .sort();
 
-            const targetDate = UNIQUE_DATES[CURRENT_DATE_INDEX];
-            document.getElementById('currentDateLabel').innerText = targetDate;
-            document.getElementById('currentDateSub').innerText = (CURRENT_DATE_INDEX === 0) ? "آخرین روز ثبت‌شده" : `روز ${CURRENT_DATE_INDEX + 1} از ${UNIQUE_DATES.length}`;
-
-            // تنظیم وضعیت فعال/غیرفعال دکمه‌های + و -
-            document.getElementById('btnNextDate').disabled = (CURRENT_DATE_INDEX === 0);
-            document.getElementById('btnPrevDate').disabled = (CURRENT_DATE_INDEX === UNIQUE_DATES.length - 1);
-
-            renderAccountingView(targetDate);
+            if (validDates.length > 0) {
+                const latest = validDates[validDates.length - 1]; // مثلا "1405/07/06"
+                const parts = latest.split('/');
+                selYear = parseInt(parts[0], 10);
+                selMonth = parseInt(parts[1], 10);
+                selDay = parseInt(parts[2], 10);
+            }
+            updatePickerAndFilter();
         }
 
-        function renderAccountingView(selectedDate) {
-            const filtered = (RAW_DATA.transactions || []).filter(t => t.pureDate === selectedDate);
+        function updatePickerAndFilter() {
+            // به‌روزرسانی نمایشگر مینیمال
+            document.getElementById('dayDisplay').innerText = toPersianDigits(selDay.toString().padStart(2, '0'));
+            document.getElementById('monthDisplay').innerText = SHAMSI_MONTHS[selMonth - 1];
+            document.getElementById('yearDisplay').innerText = toPersianDigits(selYear);
+
+            // رشته استاندارد تاریخ فیلتر: yyyy/mm/dd
+            const mStr = selMonth.toString().padStart(2, '0');
+            const dStr = selDay.toString().padStart(2, '0');
+            const targetFilterDate = `${selYear}/${mStr}/${dStr}`;
+
+            renderDailyReport(targetFilterDate);
+        }
+
+        function renderDailyReport(targetDate) {
+            const filtered = (RAW_DATA.transactions || []).filter(t => t.normDate === targetDate);
             
             let posSum = 0;
             let shabaSum = 0;
@@ -390,7 +481,7 @@
             tbody.innerHTML = '';
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">هیچ فیشی برای این روز پیدا نشد.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">هیچ رکوردی برای تاریخ ${toPersianDigits(targetDate)} ثبت نشده است.</td></tr>`;
                 document.getElementById('todayPos').innerText = '۰ تومان';
                 document.getElementById('todayShaba').innerText = '۰ تومان';
                 document.getElementById('todayCount').innerText = '۰ عدد';
@@ -399,21 +490,22 @@
 
             filtered.forEach(t => {
                 const methodStr = String(t.method || '');
+                const amt = Number(t.amount || 0);
                 if (methodStr.includes('کارتخوان') || methodStr.includes('POS')) {
-                    posSum += Number(t.amount || 0);
+                    posSum += amt;
                 } else {
-                    shabaSum += Number(t.amount || 0);
+                    shabaSum += amt;
                 }
 
-                const titleDesc = t.sub ? `${t.type} (${t.sub})` : t.type;
+                const desc = t.sub ? `${t.type} (${t.sub})` : t.type;
                 tbody.innerHTML += `
                     <tr>
-                        <td style="color:#7e9ea3;">${t.pureTime || '-'}</td>
+                        <td style="color:#72969b;">${t.normTime || '-'}</td>
                         <td style="font-weight:700; color:#fff;">${t.unit}</td>
-                        <td>${titleDesc}</td>
-                        <td style="font-weight:700; color:var(--accent);">${Number(t.amount || 0).toLocaleString('fa-IR')}</td>
+                        <td>${desc}</td>
+                        <td style="font-weight:700; color:var(--accent);">${amt.toLocaleString('fa-IR')}</td>
                         <td>${t.method}</td>
-                        <td><small style="letter-spacing:1px;">${t.rrn}</small></td>
+                        <td><small style="letter-spacing:0.5px;">${t.rrn}</small></td>
                         <td>${t.receipt || '-'}</td>
                     </tr>
                 `;
@@ -424,6 +516,7 @@
             document.getElementById('todayCount').innerText = filtered.length.toLocaleString('fa-IR') + ' عدد';
         }
 
+        // بخش مدیریت پلاک
         function searchUnit() {
             const rawQuery = document.getElementById('unitSearch').value.trim();
             const resultBox = document.getElementById('unitResult');
@@ -437,7 +530,6 @@
 
             const queryEn = toEnglishDigits(rawQuery).toLowerCase();
 
-            // جستجو در تب لجر
             let info = null;
             if (RAW_DATA.ledgers) {
                 for (const [key, val] of Object.entries(RAW_DATA.ledgers)) {
@@ -448,7 +540,6 @@
                 }
             }
 
-            // ریزتراکنش‌ها
             const unitTx = (RAW_DATA.transactions || []).filter(t => 
                 toEnglishDigits(t.unit).toLowerCase() === queryEn
             );
