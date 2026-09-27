@@ -6,92 +6,173 @@
     <title>داشبورد گزارشات مهستان</title>
     <style>
         :root {
-            --bg-color: #0d1719;
-            --card-bg: #152528;
-            --border-color: #264347;
-            --text-main: #e0f2f1;
-            --text-muted: #80cbc4;
-            --accent: #26a69a;
-            --danger: #ef5350;
-            --success: #66bb6a;
+            --bg-color: #0b1416;
+            --card-bg: #122124;
+            --card-border: #1f393d;
+            --accent: #2dd4bf;
+            --accent-glow: rgba(45, 212, 191, 0.15);
+            --text-main: #f0fdfa;
+            --text-muted: #99f6e4;
+            --text-dim: #5eead4;
+            --danger: #f87171;
+            --success: #4ade80;
         }
-        * { box-sizing: border-box; font-family: Tahoma, 'B Nazanin', sans-serif; }
-        body { background: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px 12px; }
-        .container { max-width: 900px; margin: auto; }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, 'B Nazanin', sans-serif; }
+        body { background: var(--bg-color); color: var(--text-main); margin: 0; padding: 25px 14px; min-height: 100vh; }
+        .container { max-width: 940px; margin: auto; }
 
         /* کلید سوئیچ اپل */
         .switch-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 25px;
-            background: #111f22;
-            padding: 10px 20px;
-            border-radius: 50px;
+            gap: 14px;
+            margin-bottom: 28px;
+            background: #0f1c1e;
+            padding: 8px 18px;
+            border-radius: 40px;
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
-        .switch-label { font-size: 14px; font-weight: bold; color: var(--text-muted); }
+        .switch-label { font-size: 14px; font-weight: 600; color: #5c7f84; transition: color .3s; }
         .switch-label.active { color: #fff; }
-        .ios-switch {
-            position: relative;
-            display: inline-block;
-            width: 52px;
-            height: 28px;
-        }
+        .ios-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .ios-switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #37474f; transition: .3s; border-radius: 34px;
+            background-color: #26383b; transition: .3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 30px;
         }
         .slider:before {
             position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px;
-            background-color: white; transition: .3s; border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            background-color: white; transition: .3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
         }
         input:checked + .slider { background-color: var(--accent); }
-        input:checked + .slider:before { transform: translateX(24px); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
         .view-section { display: none; }
-        .view-section.active { display: block; }
+        .view-section.active { display: block; animation: fadeIn .35s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* کارت‌ها و المان‌ها */
+        /* کارت اصلی */
         .card {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+        }
+
+        /* ویجت روان انتخاب تاریخ به سبک اپل */
+        .date-picker-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .picker-title { font-size: 13px; color: #7e9ea3; font-weight: 500; }
+        
+        .apple-stepper {
+            display: inline-flex;
+            align-items: center;
+            background: #091314;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+        }
+        .stepper-btn {
+            background: #152528;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .stepper-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+        .stepper-btn:active { transform: scale(0.92); }
+        .stepper-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+        
+        .date-display-box {
+            min-width: 150px;
+            text-align: center;
+            padding: 0 16px;
+            position: relative;
+        }
+        .date-val {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--accent);
+            display: inline-block;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .date-sub {
+            font-size: 11px;
+            color: #6d8e93;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* کارت‌های آمار ۳ گانه */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .stat-box {
+            background: #0b1618;
+            border: 1px solid var(--card-border);
+            padding: 16px 14px;
             border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 18px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            transition: transform 0.2s;
         }
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .stat-box { background: #0c1a1c; border: 1px solid var(--border-color); padding: 14px; border-radius: 10px; text-align: center; }
-        .stat-title { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
-        .stat-value { font-size: 18px; font-weight: bold; color: #fff; }
+        .stat-title { font-size: 12px; color: #7e9ea3; margin-bottom: 6px; }
+        .stat-value { font-size: 19px; font-weight: 800; color: #fff; }
 
-        /* فرم و جست‌وجو */
-        select, input {
-            background: #0b1517; border: 1px solid var(--border-color);
-            color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; width: 100%;
+        /* جدول واکنش‌گرا */
+        .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--card-border); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: right; background: #0c181a; }
+        th { background: #132427; color: #8faeb3; padding: 12px 10px; font-weight: 600; border-bottom: 1px solid var(--card-border); }
+        td { padding: 12px 10px; border-bottom: 1px solid #14282b; color: #d4e7e9; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: #112225; }
+
+        /* بخش جستجوی مدیریت */
+        .search-input {
+            width: 100%;
+            background: #091314;
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 13px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color .2s;
         }
+        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
-        /* جدول حسابداری */
-        .table-wrap { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: right; }
-        th { background: #1b3236; color: var(--text-muted); padding: 10px 8px; border-bottom: 1px solid var(--border-color); }
-        td { padding: 9px 8px; border-bottom: 1px solid #1c2e31; }
-        tr:hover { background: #162c2f; }
-
-        #loading { text-align: center; padding: 40px; font-size: 15px; color: var(--text-muted); }
+        #loading { text-align: center; padding: 50px 20px; font-size: 15px; color: #7e9ea3; }
+        .empty-state { text-align: center; color: #5f7f84; padding: 35px 15px; font-size: 13px; }
     </style>
 </head>
 <body>
     <div class="container">
         
-        <!-- سوئیچ اپل -->
+        <!-- سوئیچ بالایی سبک اپل -->
         <div class="switch-wrapper">
             <span class="switch-label active" id="label-acc">گزارش حسابداری</span>
             <label class="ios-switch">
@@ -101,26 +182,39 @@
             <span class="switch-label" id="label-mgr">مرور مدیریتی</span>
         </div>
 
-        <div id="loading">در حال بارگذاری اطلاعات زنده از گوگل شیت...</div>
+        <div id="loading">در حال برقراری اتصال به گوگل شیت و دریافت دیتابیس...</div>
 
         <div id="content" style="display: none;">
             
-            <!-- نمای ۱: گزارش حسابداری (مرادی) -->
+            <!-- تب ۱: گزارش حسابداری روزانه -->
             <div id="accView" class="view-section active">
                 <div class="card">
-                    <div style="max-width: 250px; margin-bottom: 15px;">
-                        <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">انتخاب تاریخ گزارش:</label>
-                        <select id="dateFilter" onchange="renderAccountingView()"></select>
+                    
+                    <!-- کنترلر تاریخ روان با کلید منفی و مثبت -->
+                    <div class="date-picker-wrapper">
+                        <div>
+                            <div class="picker-title">گزارش روزانه تجمیعی کارتخوان و شبا</div>
+                        </div>
+                        
+                        <div class="apple-stepper">
+                            <button class="stepper-btn" id="btnPrevDate" onclick="changeDateIndex(-1)" title="روز قبل">−</button>
+                            <div class="date-display-box">
+                                <span class="date-val" id="currentDateLabel">---</span>
+                                <span class="date-sub" id="currentDateSub">انتخاب روز</span>
+                            </div>
+                            <button class="stepper-btn" id="btnNextDate" onclick="changeDateIndex(1)" title="روز بعد">+</button>
+                        </div>
                     </div>
 
+                    <!-- باکس‌های جمع مبالغ -->
                     <div class="stat-grid">
                         <div class="stat-box">
-                            <div class="stat-title">جمع کارتخوان (پوز) امروز</div>
-                            <div class="stat-value" id="todayPos" style="color: var(--success);">۰ تومان</div>
+                            <div class="stat-title">جمع کارتخوان (POS) روز</div>
+                            <div class="stat-value" id="todayPos" style="color: var(--accent);">۰ تومان</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-title">جمع انتقال شبا امروز</div>
-                            <div class="stat-value" id="todayShaba">۰ تومان</div>
+                            <div class="stat-title">جمع انتقال شبا / ساتنا</div>
+                            <div class="stat-value" id="todayShaba" style="color: #67e8f9;">۰ تومان</div>
                         </div>
                         <div class="stat-box">
                             <div class="stat-title">تعداد کل فیش‌های روز</div>
@@ -128,6 +222,7 @@
                         </div>
                     </div>
 
+                    <!-- لیست جدول فیش‌های همان روز -->
                     <div class="table-wrap">
                         <table>
                             <thead>
@@ -147,13 +242,13 @@
                 </div>
             </div>
 
-            <!-- نمای ۲: مرور مدیریتی -->
+            <!-- تب ۲: مرور سریع مدیریت -->
             <div id="mgrView" class="view-section">
                 <div class="card">
-                    <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px;">جست‌وجوی پلاک واحد:</label>
-                    <input type="text" id="unitSearch" placeholder="مثلاً: A-14 یا 240 را وارد کنید..." oninput="searchUnit()">
+                    <label style="font-size: 13px; color: #7e9ea3; display: block; margin-bottom: 8px;">جست‌وجوی پلاک واحد:</label>
+                    <input type="text" id="unitSearch" class="search-input" placeholder="مثلاً: 110 یا 240 یا A-14..." oninput="searchUnit()">
                     
-                    <div id="unitResult" style="margin-top: 20px; display: none;">
+                    <div id="unitResult" style="margin-top: 22px; display: none;">
                         <div class="stat-grid">
                             <div class="stat-box">
                                 <div class="stat-title">نام فروشگاه</div>
@@ -173,14 +268,14 @@
                             </div>
                         </div>
 
-                        <h4 style="font-size: 13px; color: var(--text-muted); margin-top: 20px; margin-bottom: 8px;">ریز پرداخت‌های این واحد:</h4>
+                        <div style="font-size: 13px; color: #7e9ea3; margin: 18px 4px 8px;">سوابق پرداخت‌های ثبت‌شده برای این واحد:</div>
                         <div class="table-wrap">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>تاریخ</th>
+                                        <th>تاریخ و ساعت</th>
                                         <th>نوع شارژ</th>
-                                        <th>مبلغ</th>
+                                        <th>مبلغ (تومان)</th>
                                         <th>پیگیری شاپرک</th>
                                         <th>قبض</th>
                                     </tr>
@@ -189,7 +284,7 @@
                             </table>
                         </div>
                     </div>
-                    <div id="noUnitFound" style="text-align: center; color: #78909c; padding: 20px; display: none;">پلاکی با این مشخصات یافت نشد.</div>
+                    <div id="noUnitFound" class="empty-state" style="display: none;">پلاکی با این مشخصات یافت نشد.</div>
                 </div>
             </div>
 
@@ -199,17 +294,55 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxvRvMICYcbtkWAQVJ1a8InqZyFUpwzOfIg4KsdfJd0bA9wT2q81McNBmsyyoeaAc19qA/exec";
         let RAW_DATA = null;
+        let UNIQUE_DATES = [];
+        let CURRENT_DATE_INDEX = 0;
+
+        function toEnglishDigits(str) {
+            if (!str) return '';
+            return str.toString()
+                .replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d))
+                .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
+                .trim();
+        }
+
+        // تمیزکاری و استخراج تاریخ شمسی
+        function parseJalali(dateStr) {
+            if (!dateStr) return { d: '', t: '' };
+            let clean = dateStr.trim();
+            // اگر خروجی به شکل فرمت تاریخ آبجکت میلادی آمده باشد آن را کنترل می‌کنیم
+            let parts = clean.split(' ');
+            let d = parts[0] || '';
+            let t = parts[1] || '';
+            return { d, t };
+        }
 
         async function fetchData() {
             try {
                 const res = await fetch(API_URL);
                 RAW_DATA = await res.json();
+                
+                // مرتب‌سازی تراکنش‌ها
+                (RAW_DATA.transactions || []).forEach(tx => {
+                    const parsed = parseJalali(tx.date);
+                    tx.pureDate = parsed.d;
+                    tx.pureTime = parsed.t;
+                });
+
+                // استخراج تاریخ‌های یکتا به ترتیب جدیدترین
+                const dateSet = new Set();
+                RAW_DATA.transactions.forEach(tx => {
+                    if (tx.pureDate) dateSet.add(tx.pureDate);
+                });
+                UNIQUE_DATES = Array.from(dateSet).sort().reverse();
+
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
-                populateDates();
-                renderAccountingView();
+
+                CURRENT_DATE_INDEX = 0;
+                updateDateStepper();
             } catch (e) {
-                document.getElementById('loading').innerText = "خطا در دریافت اطلاعات از سرور گوگل.";
+                document.getElementById('loading').innerText = "خطا در اتصال به گوگل شیت یا بارگذاری داده‌ها.";
+                console.error(e);
             }
         }
 
@@ -221,42 +354,67 @@
             document.getElementById('label-mgr').classList.toggle('active', isMgr);
         }
 
-        function populateDates() {
-            const dateSelect = document.getElementById('dateFilter');
-            const dates = [...new Set(RAW_DATA.transactions.map(t => t.date.split(' ')[0]))].reverse();
-            dateSelect.innerHTML = '';
-            dates.forEach(d => {
-                const opt = document.createElement('option');
-                opt.value = d;
-                opt.innerText = d;
-                dateSelect.appendChild(opt);
-            });
+        function changeDateIndex(delta) {
+            const newIndex = CURRENT_DATE_INDEX - delta; // دکمه مثبت (+) به روز جدیدتر و منفی (-) به روز قبل‌تر می‌رود
+            if (newIndex >= 0 && newIndex < UNIQUE_DATES.length) {
+                CURRENT_DATE_INDEX = newIndex;
+                updateDateStepper();
+            }
         }
 
-        function renderAccountingView() {
-            const selectedDate = document.getElementById('dateFilter').value;
-            const filtered = RAW_DATA.transactions.filter(t => t.date.startsWith(selectedDate));
+        function updateDateStepper() {
+            if (UNIQUE_DATES.length === 0) {
+                document.getElementById('currentDateLabel').innerText = "بدون داده";
+                document.getElementById('btnPrevDate').disabled = true;
+                document.getElementById('btnNextDate').disabled = true;
+                return;
+            }
+
+            const targetDate = UNIQUE_DATES[CURRENT_DATE_INDEX];
+            document.getElementById('currentDateLabel').innerText = targetDate;
+            document.getElementById('currentDateSub').innerText = (CURRENT_DATE_INDEX === 0) ? "آخرین روز ثبت‌شده" : `روز ${CURRENT_DATE_INDEX + 1} از ${UNIQUE_DATES.length}`;
+
+            // تنظیم وضعیت فعال/غیرفعال دکمه‌های + و -
+            document.getElementById('btnNextDate').disabled = (CURRENT_DATE_INDEX === 0);
+            document.getElementById('btnPrevDate').disabled = (CURRENT_DATE_INDEX === UNIQUE_DATES.length - 1);
+
+            renderAccountingView(targetDate);
+        }
+
+        function renderAccountingView(selectedDate) {
+            const filtered = (RAW_DATA.transactions || []).filter(t => t.pureDate === selectedDate);
             
             let posSum = 0;
             let shabaSum = 0;
             const tbody = document.getElementById('dailyTableBody');
             tbody.innerHTML = '';
 
-            filtered.forEach(t => {
-                if (t.method.includes('کارتخوان') || t.method.includes('POS')) posSum += t.amount;
-                else shabaSum += t.amount;
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">هیچ فیشی برای این روز پیدا نشد.</td></tr>`;
+                document.getElementById('todayPos').innerText = '۰ تومان';
+                document.getElementById('todayShaba').innerText = '۰ تومان';
+                document.getElementById('todayCount').innerText = '۰ عدد';
+                return;
+            }
 
-                const time = t.date.split(' ')[1] || '';
+            filtered.forEach(t => {
+                const methodStr = String(t.method || '');
+                if (methodStr.includes('کارتخوان') || methodStr.includes('POS')) {
+                    posSum += Number(t.amount || 0);
+                } else {
+                    shabaSum += Number(t.amount || 0);
+                }
+
                 const titleDesc = t.sub ? `${t.type} (${t.sub})` : t.type;
                 tbody.innerHTML += `
                     <tr>
-                        <td>${time}</td>
-                        <td style="font-weight:bold;">${t.unit}</td>
+                        <td style="color:#7e9ea3;">${t.pureTime || '-'}</td>
+                        <td style="font-weight:700; color:#fff;">${t.unit}</td>
                         <td>${titleDesc}</td>
-                        <td>${t.amount.toLocaleString('fa-IR')}</td>
+                        <td style="font-weight:700; color:var(--accent);">${Number(t.amount || 0).toLocaleString('fa-IR')}</td>
                         <td>${t.method}</td>
-                        <td><small>${t.rrn}</small></td>
-                        <td>${t.receipt}</td>
+                        <td><small style="letter-spacing:1px;">${t.rrn}</small></td>
+                        <td>${t.receipt || '-'}</td>
                     </tr>
                 `;
             });
@@ -267,42 +425,74 @@
         }
 
         function searchUnit() {
-            const query = document.getElementById('unitSearch').value.trim();
+            const rawQuery = document.getElementById('unitSearch').value.trim();
             const resultBox = document.getElementById('unitResult');
             const notFound = document.getElementById('noUnitFound');
             
-            if (!query) {
+            if (!rawQuery) {
                 resultBox.style.display = 'none';
                 notFound.style.display = 'none';
                 return;
             }
 
-            const info = RAW_DATA.ledgers[query];
-            if (info) {
-                resultBox.style.display = 'block';
-                notFound.style.display = 'none';
-                document.getElementById('resName').innerText = info.name || '-';
-                document.getElementById('resDemand').innerText = info.totalDemand.toLocaleString('fa-IR') + ' تومان';
-                document.getElementById('resPaid').innerText = info.totalPaid.toLocaleString('fa-IR') + ' تومان';
-                document.getElementById('resBalance').innerText = info.balance.toLocaleString('fa-IR') + ' تومان';
+            const queryEn = toEnglishDigits(rawQuery).toLowerCase();
 
-                const unitTx = RAW_DATA.transactions.filter(t => t.unit === query);
-                const historyBody = document.getElementById('unitHistoryBody');
-                historyBody.innerHTML = '';
+            // جستجو در تب لجر
+            let info = null;
+            if (RAW_DATA.ledgers) {
+                for (const [key, val] of Object.entries(RAW_DATA.ledgers)) {
+                    if (toEnglishDigits(key).toLowerCase() === queryEn) {
+                        info = val;
+                        break;
+                    }
+                }
+            }
+
+            // ریزتراکنش‌ها
+            const unitTx = (RAW_DATA.transactions || []).filter(t => 
+                toEnglishDigits(t.unit).toLowerCase() === queryEn
+            );
+
+            if (!info && unitTx.length === 0) {
+                resultBox.style.display = 'none';
+                notFound.style.display = 'block';
+                return;
+            }
+
+            resultBox.style.display = 'block';
+            notFound.style.display = 'none';
+
+            if (info) {
+                document.getElementById('resName').innerText = info.name || '-';
+                document.getElementById('resDemand').innerText = Number(info.totalDemand).toLocaleString('fa-IR') + ' تومان';
+                document.getElementById('resPaid').innerText = Number(info.totalPaid).toLocaleString('fa-IR') + ' تومان';
+                document.getElementById('resBalance').innerText = Number(info.balance).toLocaleString('fa-IR') + ' تومان';
+            } else {
+                const totalPaidCalc = unitTx.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+                document.getElementById('resName').innerText = 'واحد جدید (ثبت‌نشده در پایه)';
+                document.getElementById('resDemand').innerText = 'نامشخص';
+                document.getElementById('resPaid').innerText = totalPaidCalc.toLocaleString('fa-IR') + ' تومان';
+                document.getElementById('resBalance').innerText = 'نامشخص';
+            }
+
+            const historyBody = document.getElementById('unitHistoryBody');
+            historyBody.innerHTML = '';
+            
+            if (unitTx.length > 0) {
                 unitTx.forEach(t => {
+                    const desc = t.sub ? `${t.type} (${t.sub})` : t.type;
                     historyBody.innerHTML += `
                         <tr>
                             <td>${t.date}</td>
-                            <td>${t.type}</td>
-                            <td>${t.amount.toLocaleString('fa-IR')}</td>
+                            <td>${desc}</td>
+                            <td style="color:var(--accent); font-weight:bold;">${Number(t.amount).toLocaleString('fa-IR')}</td>
                             <td><small>${t.rrn}</small></td>
-                            <td>${t.receipt}</td>
+                            <td>${t.receipt || '-'}</td>
                         </tr>
                     `;
                 });
             } else {
-                resultBox.style.display = 'none';
-                notFound.style.display = 'block';
+                historyBody.innerHTML = `<tr><td colspan="5" class="empty-state">هنوز هیچ فیش پرداختی برای این پلاک ثبت نشده است.</td></tr>`;
             }
         }
 
