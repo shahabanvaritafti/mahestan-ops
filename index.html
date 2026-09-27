@@ -1,1 +1,145 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت وصولی شارژ مجتمع مهستان</title>
+    <style>
+        * { box-sizing: border-box; font-family: Tahoma, 'B Nazanin', sans-serif; }
+        body { background: #0f1c1e; color: #fff; padding: 20px 12px; margin: 0; display: flex; justify-content: center; }
+        .card { max-width: 440px; width: 100%; background: #1a2f32; border: 1px solid #376569; padding: 22px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+        h2 { font-size: 18px; text-align: center; color: #80cbc4; margin-top: 0; margin-bottom: 20px; border-bottom: 1px dashed #376569; padding-bottom: 10px; }
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #cfd8dc; }
+        input, select { width: 100%; padding: 11px; border: 1px solid #376569; border-radius: 8px; font-size: 14px; outline: none; background: #0f1c1e; color: #fff; }
+        input:focus, select:focus { border-color: #80cbc4; }
+        button { width: 100%; padding: 13px; background: #4eb5a5; color: #0b1a1c; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #3fa293; }
+        #msg { text-align: center; font-size: 13px; margin-top: 14px; font-weight: bold; min-height: 22px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>فرم ثبت فیش و شارژ مهستان</h2>
+        
+        <div class="form-group">
+            <label>کد پلاک / شماره واحد:</label>
+            <input type="text" id="unit_id" placeholder="مثال: A-14 یا ۱۷۷" required>
+        </div>
 
+        <div class="form-group">
+            <label>نوع شارژ و دریافتی:</label>
+            <select id="charge_type" onchange="toggleSubTitle()">
+                <option value="شارژ ماهیانه">شارژ ماهیانه (عادی)</option>
+                <option value="مالکانه">شارژ مالکانه</option>
+                <option value="مشاعات و تابلو">مشاعات و تابلوهای تبلیغاتی</option>
+                <option value="متفرقه">متفرقه (برق/گاز، انتظامات، کاغذ و...)</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="subTitleGroup" style="display: none;">
+            <label>شرح متفرقه / نام غرفه یا هزینه:</label>
+            <input type="text" id="sub_title" placeholder="مثال: گاز ارکیده، انتظامات بورس طلا، خرید کاغذ">
+        </div>
+
+        <div class="form-group">
+            <label>مبلغ دریافتی (تومان):</label>
+            <input type="number" id="amount" placeholder="مثال: 3500000" required>
+        </div>
+
+        <div class="form-group">
+            <label>روش پرداخت:</label>
+            <select id="pay_method">
+                <option value="کارتخوان (POS)">کارتخوان (POS)</option>
+                <option value="انتقال شبا">انتقال شبا / ساتنا</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>کد پیگیری شاپرک (RRN):</label>
+            <input type="text" id="rrn" placeholder="شماره پیگیری چاپ‌شده روی رسید پوز" required>
+        </div>
+
+        <div class="form-group">
+            <label>شماره قبض کاغذی (دسته‌رسید):</label>
+            <input type="text" id="receipt_no" placeholder="شماره فیش سفید/بنفش/زرد">
+        </div>
+
+        <div class="form-group">
+            <label>یادداشت و توضیحات:</label>
+            <input type="text" id="note" placeholder="مثال: واحد بدهی قبلی را نپذیرفت">
+        </div>
+
+        <button id="submitBtn" onclick="submitForm()">ثبت فوری در گوگل شیت</button>
+        <div id="msg"></div>
+    </div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvRvMICYcbtkWAQVJ1a8InqZyFUpwzOfIg4KsdfJd0bA9wT2q81McNBmsyyoeaAc19qA/exec";
+
+        function toggleSubTitle() {
+            const chargeType = document.getElementById('charge_type').value;
+            const subTitleGroup = document.getElementById('subTitleGroup');
+            subTitleGroup.style.display = (chargeType === 'متفرقه') ? 'block' : 'none';
+        }
+
+        async function submitForm() {
+            const unit_id = document.getElementById('unit_id').value.trim();
+            const charge_type = document.getElementById('charge_type').value;
+            const sub_title = document.getElementById('sub_title').value.trim();
+            const amount = document.getElementById('amount').value.trim();
+            const pay_method = document.getElementById('pay_method').value;
+            const rrn = document.getElementById('rrn').value.trim();
+            const receipt_no = document.getElementById('receipt_no').value.trim();
+            const note = document.getElementById('note').value.trim();
+            const msgEl = document.getElementById('msg');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (!unit_id || !amount || !rrn) {
+                alert('لطفاً حداقل پلاک، مبلغ و شماره پیگیری پوز را وارد کنید.');
+                return;
+            }
+
+            const payload = {
+                unit_id: unit_id,
+                charge_type: charge_type,
+                sub_title: sub_title,
+                amount: parseInt(amount),
+                pay_method: pay_method,
+                rrn: rrn,
+                receipt_no: receipt_no,
+                note: note
+            };
+
+            msgEl.innerText = "در حال ثبت اطلاعات در شیت...";
+            msgEl.style.color = "#80cbc4";
+            submitBtn.disabled = true;
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                msgEl.innerText = "✓ با موفقیت در گوگل شیت ثبت شد.";
+                msgEl.style.color = "#81c784";
+
+                document.getElementById('amount').value = '';
+                document.getElementById('rrn').value = '';
+                document.getElementById('receipt_no').value = '';
+                document.getElementById('note').value = '';
+                document.getElementById('unit_id').value = '';
+
+            } catch (err) {
+                msgEl.innerText = "خطا در ارسال اطلاعات.";
+                msgEl.style.color = "#e57373";
+                console.error(err);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
