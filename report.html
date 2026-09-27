@@ -20,7 +20,7 @@
         body { background: var(--bg); color: var(--text-main); margin: 0; padding: 24px 12px; min-height: 100vh; }
         .container { max-width: 900px; margin: auto; }
 
-        /* کلید سوئیچ اپل: بار همیشه ملایم و متن فعال پرنور */
+        /* کلید سوئیچ اپل: نوار خنثی و عنوان فعال پرنور */
         .switch-wrapper {
             display: flex;
             align-items: center;
@@ -46,7 +46,7 @@
         .switch-label.active {
             color: #ffffff;
             font-weight: 700;
-            text-shadow: 0 0 12px rgba(255,255,255,0.4);
+            text-shadow: 0 0 12px rgba(255,255,255,0.45);
         }
         .ios-switch { position: relative; display: inline-block; width: 48px; height: 26px; }
         .ios-switch input { opacity: 0; width: 0; height: 0; }
@@ -74,7 +74,7 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.35);
         }
 
-        /* دکمه باز کردن تقویم بازشو با لبه‌های خمیده */
+        /* دکمه باز کردن تقویم */
         .picker-container { position: relative; margin-bottom: 20px; }
         .date-trigger-btn {
             background: #0b1517;
@@ -94,7 +94,7 @@
         .date-trigger-btn:hover { border-color: var(--accent); }
         .date-trigger-icon { color: var(--accent); font-size: 16px; }
 
-        /* پنجره شناور تقویم ماهانه */
+        /* پنجره شناور تقویم بازشو */
         .calendar-popover {
             position: absolute;
             top: 52px;
@@ -131,7 +131,7 @@
             outline: none;
         }
 
-        /* گرید مربعی روزهای ماه */
+        /* گرید روزها */
         .days-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -217,19 +217,17 @@
 
         <div id="content" style="display: none;">
             
-            <!-- نمای حسابداری -->
+            <!-- نمای ۱: گزارش حسابداری -->
             <div id="accView" class="view-section active">
                 <div class="card">
                     
-                    <!-- کنترلر بازشو تقویم هجری شمسی -->
                     <div class="picker-container">
                         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">تاریخ گزارش روزانه:</div>
                         <button class="date-trigger-btn" onclick="toggleCalendar()">
                             <span class="date-trigger-icon">📅</span>
-                            <span id="selectedDateText">۱۴۰۵/۰۷/۰۶</span>
+                            <span id="selectedDateText">---</span>
                         </button>
 
-                        <!-- تقویم پنجره‌ای با فیلدهای ماه، سال و شبکه روزها -->
                         <div class="calendar-popover" id="calendarPopover">
                             <div class="cal-header">
                                 <select id="calMonthSelect" class="cal-select" onchange="renderDaysGrid()"></select>
@@ -239,7 +237,6 @@
                         </div>
                     </div>
 
-                    <!-- کارت‌های ۳ گانه ارقام روز -->
                     <div class="stat-grid">
                         <div class="stat-box">
                             <div class="stat-title">جمع کارتخوان (POS) روز</div>
@@ -255,7 +252,6 @@
                         </div>
                     </div>
 
-                    <!-- جدول فیش‌های همان روز -->
                     <div class="table-wrap">
                         <table>
                             <thead>
@@ -275,7 +271,7 @@
                 </div>
             </div>
 
-            <!-- نمای مدیریت واحد -->
+            <!-- نمای ۲: مرور مدیریتی پلاک -->
             <div id="mgrView" class="view-section">
                 <div class="card">
                     <label style="font-size: 13px; color: var(--text-dim); display: block; margin-bottom: 8px;">جست‌وجوی پلاک واحد:</label>
@@ -352,41 +348,25 @@
             return n.toString().replace(/\d/g, d => p[d]);
         }
 
-        // استخراج مطمئن تاریخ شمسی و ساعت از رشته‌های شیت
-        function cleanTx(tx) {
-            const raw = toEn(tx.date || '');
-            let y = '', m = '', d = '', time = '';
-            
-            const match = raw.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-            if (match) {
-                y = match[1];
-                m = match[2].padStart(2, '0');
-                d = match[3].padStart(2, '0');
-            }
-            const timeMatch = raw.match(/(\d{1,2}:\d{2})/);
-            if (timeMatch) time = timeMatch[1];
-
-            tx.fullDate = (y && m && d) ? `${y}/${m}/${d}` : raw.split(' ')[0];
-            tx.time = time;
-            tx.y = parseInt(y, 10) || 0;
-            tx.m = parseInt(m, 10) || 0;
-            tx.d = parseInt(d, 10) || 0;
-        }
-
         async function fetchData() {
             try {
                 const res = await fetch(API_URL);
                 RAW_DATA = await res.json();
 
-                (RAW_DATA.transactions || []).forEach(cleanTx);
-
-                // تعیین آخرین تاریخ موجود در دیتابیس به عنوان پیش‌فرض
-                const validTxs = (RAW_DATA.transactions || []).filter(t => t.y > 1300);
-                if (validTxs.length > 0) {
-                    const last = validTxs[validTxs.length - 1];
-                    selectedY = last.y;
-                    selectedM = last.m;
-                    selectedD = last.d;
+                // پیدا کردن آخرین تاریخ ثبت‌شده در تراکنش‌ها به عنوان پیش‌فرض
+                let foundLatest = false;
+                if (RAW_DATA.transactions && RAW_DATA.transactions.length > 0) {
+                    for (let i = RAW_DATA.transactions.length - 1; i >= 0; i--) {
+                        const rawCell = toEn(RAW_DATA.transactions[i].date || '');
+                        const m = rawCell.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+                        if (m) {
+                            selectedY = parseInt(m[1], 10);
+                            selectedM = parseInt(m[2], 10);
+                            selectedD = parseInt(m[3], 10);
+                            foundLatest = true;
+                            break;
+                        }
+                    }
                 }
 
                 initCalendarDropdowns();
@@ -400,7 +380,6 @@
             }
         }
 
-        // ناوبری سوئیچ
         function setMode(isMgr) {
             document.getElementById('modeSwitch').checked = isMgr;
             applyMode();
@@ -414,7 +393,6 @@
             document.getElementById('label-mgr').classList.toggle('active', isMgr);
         }
 
-        // تنظیمات تقویم شناور
         function initCalendarDropdowns() {
             const mSel = document.getElementById('calMonthSelect');
             mSel.innerHTML = '';
@@ -443,11 +421,10 @@
             if (pop.classList.contains('open')) renderDaysGrid();
         }
 
-        // بستن تقویم با کلیک بیرون از آن
         document.addEventListener('click', function(e) {
             const pop = document.getElementById('calendarPopover');
             const trigger = document.querySelector('.date-trigger-btn');
-            if (!pop.contains(e.target) && !trigger.contains(e.target)) {
+            if (pop && trigger && !pop.contains(e.target) && !trigger.contains(e.target)) {
                 pop.classList.remove('open');
             }
         });
@@ -481,68 +458,39 @@
         function updateCalendarUI() {
             const mStr = selectedM.toString().padStart(2, '0');
             const dStr = selectedD.toString().padStart(2, '0');
-            const dateStr = `${selectedY}/${mStr}/${dStr}`;
+            const targetDate = `${selectedY}/${mStr}/${dStr}`;
             
             document.getElementById('selectedDateText').innerText = `${toFa(selectedD)} ${SHAMSI_MONTHS[selectedM - 1]} ${toFa(selectedY)}`;
 
-            renderDailyReport(dateStr);
+            renderDailyReport(targetDate);
         }
 
-       function renderDailyReport(targetDate) {
-    // تبدیل تاریخ انتخابی به ارقام انگلیسی یکدست: مثلا "1405/07/06"
-    const targetEn = toEn(targetDate).trim();
-    
-    // فیلتر هوشمند: بررسی می‌کند آیا سلول تاریخ با این تاریخ شروع می‌شود یا نه
-    const filtered = (RAW_DATA.transactions || []).filter(t => {
-        const rawCell = toEn(t.date || '').trim();
-        // هم حالت startsWith و هم حالت وجود داشتن در ابتدای متن را پوشش می‌دهد
-        return rawCell.startsWith(targetEn) || rawCell.includes(targetEn);
-    });
-    
-    let posSum = 0;
-    let shabaSum = 0;
-    const tbody = document.getElementById('dailyTableBody');
-    tbody.innerHTML = '';
+        function renderDailyReport(targetDate) {
+            const targetEn = toEn(targetDate).trim();
+            
+            // تطابق تاریخ با هر دو حالت فرمت ۲ رقمی یا تک رقمی ماه و روز
+            const mSingle = parseInt(targetEn.split('/')[1], 10);
+            const dSingle = parseInt(targetEn.split('/')[2], 10);
+            const altTargetEn = `${selectedY}/${mSingle}/${dSingle}`;
 
-    if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="empty-state">هیچ رکوردی برای تاریخ ${toFa(targetDate)} ثبت نشده است.</td></tr>`;
-        document.getElementById('todayPos').innerText = '۰ تومان';
-        document.getElementById('todayShaba').innerText = '۰ تومان';
-        document.getElementById('todayCount').innerText = '۰ عدد';
-        return;
-    }
+            const filtered = (RAW_DATA.transactions || []).filter(t => {
+                const rawCell = toEn(t.date || '').trim();
+                return rawCell.startsWith(targetEn) || rawCell.includes(targetEn) ||
+                       rawCell.startsWith(altTargetEn) || rawCell.includes(altTargetEn);
+            });
+            
+            let posSum = 0;
+            let shabaSum = 0;
+            const tbody = document.getElementById('dailyTableBody');
+            tbody.innerHTML = '';
 
-    filtered.forEach(t => {
-        const methodStr = String(t.method || '');
-        const amt = Number(t.amount || 0);
-        if (methodStr.includes('کارتخوان') || methodStr.includes('POS')) {
-            posSum += amt;
-        } else {
-            shabaSum += amt;
-        }
-
-        // استخراج دقیق ساعت از انتهای همان سلول (مثلا 14:35)
-        const timeMatch = toEn(t.date || '').match(/(\d{1,2}:\d{2})/);
-        const displayTime = timeMatch ? toFa(timeMatch[1]) : '-';
-
-        const desc = t.sub ? `${t.type} (${t.sub})` : t.type;
-        tbody.innerHTML += `
-            <tr>
-                <td style="color:var(--text-dim);">${displayTime}</td>
-                <td style="font-weight:700; color:#fff;">${t.unit}</td>
-                <td>${desc}</td>
-                <td style="font-weight:700; color:var(--accent);">${amt.toLocaleString('fa-IR')}</td>
-                <td>${t.method}</td>
-                <td><small style="letter-spacing:0.5px;">${t.rrn}</small></td>
-                <td>${t.receipt || '-'}</td>
-            </tr>
-        `;
-    });
-
-    document.getElementById('todayPos').innerText = posSum.toLocaleString('fa-IR') + ' تومان';
-    document.getElementById('todayShaba').innerText = shabaSum.toLocaleString('fa-IR') + ' تومان';
-    document.getElementById('todayCount').innerText = filtered.length.toLocaleString('fa-IR') + ' عدد';
-}
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">هیچ رکوردی برای تاریخ ${toFa(targetDate)} ثبت نشده است.</td></tr>`;
+                document.getElementById('todayPos').innerText = '۰ تومان';
+                document.getElementById('todayShaba').innerText = '۰ تومان';
+                document.getElementById('todayCount').innerText = '۰ عدد';
+                return;
+            }
 
             filtered.forEach(t => {
                 const methodStr = String(t.method || '');
@@ -553,10 +501,15 @@
                     shabaSum += amt;
                 }
 
+                // استخراج بخش ساعت
+                const rawCell = toEn(t.date || '');
+                const timeMatch = rawCell.match(/(\d{1,2}:\d{2})/);
+                const displayTime = timeMatch ? toFa(timeMatch[1]) : '-';
+
                 const desc = t.sub ? `${t.type} (${t.sub})` : t.type;
                 tbody.innerHTML += `
                     <tr>
-                        <td style="color:var(--text-dim);">${t.time || '-'}</td>
+                        <td style="color:var(--text-dim);">${displayTime}</td>
                         <td style="font-weight:700; color:#fff;">${t.unit}</td>
                         <td>${desc}</td>
                         <td style="font-weight:700; color:var(--accent);">${amt.toLocaleString('fa-IR')}</td>
@@ -572,7 +525,6 @@
             document.getElementById('todayCount').innerText = filtered.length.toLocaleString('fa-IR') + ' عدد';
         }
 
-        // بخش مدیریت پلاک
         function searchUnit() {
             const rawQuery = document.getElementById('unitSearch').value.trim();
             const resultBox = document.getElementById('unitResult');
