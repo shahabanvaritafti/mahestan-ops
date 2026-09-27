@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد گزارشات مهستان</title>
+    <style>
+        :root {
+            --bg-color: #0d1719;
+            --card-bg: #152528;
+            --border-color: #264347;
+            --text-main: #e0f2f1;
+            --text-muted: #80cbc4;
+            --accent: #26a69a;
+            --danger: #ef5350;
+            --success: #66bb6a;
+        }
+        * { box-sizing: border-box; font-family: Tahoma, 'B Nazanin', sans-serif; }
+        body { background: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px 12px; }
+        .container { max-width: 900px; margin: auto; }
+
+        /* کلید سوئیچ اپل */
+        .switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            background: #111f22;
+            padding: 10px 20px;
+            border-radius: 50px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid var(--border-color);
+        }
+        .switch-label { font-size: 14px; font-weight: bold; color: var(--text-muted); }
+        .switch-label.active { color: #fff; }
+        .ios-switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+        .ios-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #37474f; transition: .3s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* کارت‌ها و المان‌ها */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .stat-box { background: #0c1a1c; border: 1px solid var(--border-color); padding: 14px; border-radius: 10px; text-align: center; }
+        .stat-title { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+        .stat-value { font-size: 18px; font-weight: bold; color: #fff; }
+
+        /* فرم و جست‌وجو */
+        select, input {
+            background: #0b1517; border: 1px solid var(--border-color);
+            color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; width: 100%;
+        }
+
+        /* جدول حسابداری */
+        .table-wrap { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: right; }
+        th { background: #1b3236; color: var(--text-muted); padding: 10px 8px; border-bottom: 1px solid var(--border-color); }
+        td { padding: 9px 8px; border-bottom: 1px solid #1c2e31; }
+        tr:hover { background: #162c2f; }
+
+        #loading { text-align: center; padding: 40px; font-size: 15px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- سوئیچ اپل -->
+        <div class="switch-wrapper">
+            <span class="switch-label active" id="label-acc">گزارش حسابداری</span>
+            <label class="ios-switch">
+                <input type="checkbox" id="modeSwitch" onchange="switchMode()">
+                <span class="slider"></span>
+            </label>
+            <span class="switch-label" id="label-mgr">مرور مدیریتی</span>
+        </div>
+
+        <div id="loading">در حال بارگذاری اطلاعات زنده از گوگل شیت...</div>
+
+        <div id="content" style="display: none;">
+            
+            <!-- نمای ۱: گزارش حسابداری (مرادی) -->
+            <div id="accView" class="view-section active">
+                <div class="card">
+                    <div style="max-width: 250px; margin-bottom: 15px;">
+                        <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">انتخاب تاریخ گزارش:</label>
+                        <select id="dateFilter" onchange="renderAccountingView()"></select>
+                    </div>
+
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="stat-title">جمع کارتخوان (پوز) امروز</div>
+                            <div class="stat-value" id="todayPos" style="color: var(--success);">۰ تومان</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-title">جمع انتقال شبا امروز</div>
+                            <div class="stat-value" id="todayShaba">۰ تومان</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-title">تعداد کل فیش‌های روز</div>
+                            <div class="stat-value" id="todayCount">۰ عدد</div>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ساعت</th>
+                                    <th>پلاک</th>
+                                    <th>نوع شارژ / شرح</th>
+                                    <th>مبلغ (تومان)</th>
+                                    <th>روش</th>
+                                    <th>پیگیری شاپرک</th>
+                                    <th>قبض</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dailyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نمای ۲: مرور مدیریتی -->
+            <div id="mgrView" class="view-section">
+                <div class="card">
+                    <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px;">جست‌وجوی پلاک واحد:</label>
+                    <input type="text" id="unitSearch" placeholder="مثلاً: A-14 یا 240 را وارد کنید..." oninput="searchUnit()">
+                    
+                    <div id="unitResult" style="margin-top: 20px; display: none;">
+                        <div class="stat-grid">
+                            <div class="stat-box">
+                                <div class="stat-title">نام فروشگاه</div>
+                                <div class="stat-value" id="resName">-</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-title">کل تعهد دوره</div>
+                                <div class="stat-value" id="resDemand">-</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-title">کل پرداختی‌ها</div>
+                                <div class="stat-value" id="resPaid" style="color: var(--success);">-</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-title">مانده بدهی نهایی</div>
+                                <div class="stat-value" id="resBalance" style="color: var(--danger);">-</div>
+                            </div>
+                        </div>
+
+                        <h4 style="font-size: 13px; color: var(--text-muted); margin-top: 20px; margin-bottom: 8px;">ریز پرداخت‌های این واحد:</h4>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>تاریخ</th>
+                                        <th>نوع شارژ</th>
+                                        <th>مبلغ</th>
+                                        <th>پیگیری شاپرک</th>
+                                        <th>قبض</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="unitHistoryBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="noUnitFound" style="text-align: center; color: #78909c; padding: 20px; display: none;">پلاکی با این مشخصات یافت نشد.</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxvRvMICYcbtkWAQVJ1a8InqZyFUpwzOfIg4KsdfJd0bA9wT2q81McNBmsyyoeaAc19qA/exec";
+        let RAW_DATA = null;
+
+        async function fetchData() {
+            try {
+                const res = await fetch(API_URL);
+                RAW_DATA = await res.json();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                populateDates();
+                renderAccountingView();
+            } catch (e) {
+                document.getElementById('loading').innerText = "خطا در دریافت اطلاعات از سرور گوگل.";
+            }
+        }
+
+        function switchMode() {
+            const isMgr = document.getElementById('modeSwitch').checked;
+            document.getElementById('accView').classList.toggle('active', !isMgr);
+            document.getElementById('mgrView').classList.toggle('active', isMgr);
+            document.getElementById('label-acc').classList.toggle('active', !isMgr);
+            document.getElementById('label-mgr').classList.toggle('active', isMgr);
+        }
+
+        function populateDates() {
+            const dateSelect = document.getElementById('dateFilter');
+            const dates = [...new Set(RAW_DATA.transactions.map(t => t.date.split(' ')[0]))].reverse();
+            dateSelect.innerHTML = '';
+            dates.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.innerText = d;
+                dateSelect.appendChild(opt);
+            });
+        }
+
+        function renderAccountingView() {
+            const selectedDate = document.getElementById('dateFilter').value;
+            const filtered = RAW_DATA.transactions.filter(t => t.date.startsWith(selectedDate));
+            
+            let posSum = 0;
+            let shabaSum = 0;
+            const tbody = document.getElementById('dailyTableBody');
+            tbody.innerHTML = '';
+
+            filtered.forEach(t => {
+                if (t.method.includes('کارتخوان') || t.method.includes('POS')) posSum += t.amount;
+                else shabaSum += t.amount;
+
+                const time = t.date.split(' ')[1] || '';
+                const titleDesc = t.sub ? `${t.type} (${t.sub})` : t.type;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${time}</td>
+                        <td style="font-weight:bold;">${t.unit}</td>
+                        <td>${titleDesc}</td>
+                        <td>${t.amount.toLocaleString('fa-IR')}</td>
+                        <td>${t.method}</td>
+                        <td><small>${t.rrn}</small></td>
+                        <td>${t.receipt}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('todayPos').innerText = posSum.toLocaleString('fa-IR') + ' تومان';
+            document.getElementById('todayShaba').innerText = shabaSum.toLocaleString('fa-IR') + ' تومان';
+            document.getElementById('todayCount').innerText = filtered.length.toLocaleString('fa-IR') + ' عدد';
+        }
+
+        function searchUnit() {
+            const query = document.getElementById('unitSearch').value.trim();
+            const resultBox = document.getElementById('unitResult');
+            const notFound = document.getElementById('noUnitFound');
+            
+            if (!query) {
+                resultBox.style.display = 'none';
+                notFound.style.display = 'none';
+                return;
+            }
+
+            const info = RAW_DATA.ledgers[query];
+            if (info) {
+                resultBox.style.display = 'block';
+                notFound.style.display = 'none';
+                document.getElementById('resName').innerText = info.name || '-';
+                document.getElementById('resDemand').innerText = info.totalDemand.toLocaleString('fa-IR') + ' تومان';
+                document.getElementById('resPaid').innerText = info.totalPaid.toLocaleString('fa-IR') + ' تومان';
+                document.getElementById('resBalance').innerText = info.balance.toLocaleString('fa-IR') + ' تومان';
+
+                const unitTx = RAW_DATA.transactions.filter(t => t.unit === query);
+                const historyBody = document.getElementById('unitHistoryBody');
+                historyBody.innerHTML = '';
+                unitTx.forEach(t => {
+                    historyBody.innerHTML += `
+                        <tr>
+                            <td>${t.date}</td>
+                            <td>${t.type}</td>
+                            <td>${t.amount.toLocaleString('fa-IR')}</td>
+                            <td><small>${t.rrn}</small></td>
+                            <td>${t.receipt}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                resultBox.style.display = 'none';
+                notFound.style.display = 'block';
+            }
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>
