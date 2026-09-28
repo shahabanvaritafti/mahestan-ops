@@ -18,15 +18,35 @@
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, sans-serif; }
         body { background: var(--bg); color: var(--text-main); margin: 0; padding: 20px 14px; min-height: 100vh; }
         .container { max-width: 480px; margin: auto; }
+        
+        /* کارت لاگین */
+        #loginScreen {
+            display: flex; align-items: center; justify-content: center; min-height: 80vh;
+        }
+        .login-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+            padding: 28px; width: 100%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .login-title { font-size: 16px; font-weight: bold; margin-bottom: 20px; color: var(--accent); }
+        .login-input {
+            width: 100%; background: #0b1517; border: 1px solid var(--border); color: #fff;
+            padding: 12px 14px; border-radius: 12px; font-size: 14px; outline: none; margin-bottom: 14px; text-align: center;
+        }
+        .login-btn {
+            width: 100%; background: var(--accent); color: #061517; border: none; padding: 12px;
+            border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer;
+        }
+
+        /* کارت فرم */
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         h2 { font-size: 18px; margin-top: 0; margin-bottom: 20px; text-align: center; color: var(--accent); }
         .form-group { margin-bottom: 16px; }
         label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
-        input, select, textarea {
+        input, select {
             width: 100%; background: #0b1517; border: 1px solid var(--border); color: #fff;
             padding: 12px 14px; border-radius: 12px; font-size: 14px; outline: none; transition: border-color .2s;
         }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+        input:focus, select:focus { border-color: var(--accent); }
         .btn-submit {
             width: 100%; background: var(--accent); color: #061517; border: none;
             padding: 14px; border-radius: 14px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px;
@@ -54,48 +74,63 @@
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <h2>ثبت فیش شارژ واحدها</h2>
-            <form id="txForm" onsubmit="event.preventDefault(); showConfirmModal();">
-                <div class="form-group">
-                    <label>کد پلاک واحد:</label>
-                    <input type="text" id="unit_id" required placeholder="مثال: 110 یا 240 یا A-14">
-                </div>
-                <div class="form-group">
-                    <label>نوع شارژ:</label>
-                    <select id="charge_type">
-                        <option value="شارژ ماهیانه">شارژ ماهیانه</option>
-                        <option value="مالکانه">مالکانه</option>
-                        <option value="مشاعات و تابلو">مشاعات و تابلو</option>
-                        <option value="متفرقه">متفرقه</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>مبلغ پرداختی (تومان):</label>
-                    <input type="number" id="amount" required placeholder="مثال: 12500000">
-                </div>
-                <div class="form-group">
-                    <label>روش پرداخت:</label>
-                    <select id="pay_method">
-                        <option value="کارتخوان (POS)">کارتخوان (POS)</option>
-                        <option value="انتقال شبا">انتقال شبا / کارت به کارت</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>شماره پیگیری شاپرک (RRN):</label>
-                    <input type="text" id="rrn" placeholder="شماره پیگیری روی قبض پوز">
-                </div>
-                <div class="form-group">
-                    <label>شماره قبض دسته‌رسید کاغذی:</label>
-                    <input type="text" id="receipt_no" placeholder="شماره سریال برگه فیش">
-                </div>
-                <div class="form-group">
-                    <label>توضیحات (اختیاری):</label>
-                    <input type="text" id="note" placeholder="مثلاً: بابت تسویه مرداد ماه">
-                </div>
-                <button type="submit" class="btn-submit">ثبت و ادامه</button>
-            </form>
+        
+        <!-- صفحه لاگین -->
+        <div id="loginScreen">
+            <div class="login-card">
+                <div class="login-title">ورود به پنل ثبت فیش شارژ</div>
+                <input type="text" id="userInput" class="login-input" placeholder="نام کاربری">
+                <input type="password" id="passInput" class="login-input" placeholder="رمز عبور">
+                <button class="login-btn" onclick="checkAuth()">ورود به پنل</button>
+            </div>
         </div>
+
+        <!-- فرم اصلی -->
+        <div id="mainFormCard" style="display: none;">
+            <div class="card">
+                <h2>ثبت فیش شارژ واحدها</h2>
+                <form id="txForm" onsubmit="event.preventDefault(); showConfirmModal();">
+                    <div class="form-group">
+                        <label>کد پلاک واحد:</label>
+                        <input type="text" id="unit_id" required placeholder="مثال: 110 یا 240 یا A-14">
+                    </div>
+                    <div class="form-group">
+                        <label>نوع شارژ:</label>
+                        <select id="charge_type">
+                            <option value="شارژ ماهیانه">شارژ ماهیانه</option>
+                            <option value="مالکانه">مالکانه</option>
+                            <option value="مشاعات و تابلو">مشاعات و تابلو</option>
+                            <option value="متفرقه">متفرقه</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>مبلغ پرداختی (تومان):</label>
+                        <input type="number" id="amount" required placeholder="مثال: 12500000">
+                    </div>
+                    <div class="form-group">
+                        <label>روش پرداخت:</label>
+                        <select id="pay_method">
+                            <option value="کارتخوان (POS)">کارتخوان (POS)</option>
+                            <option value="انتقال شبا">انتقال شبا / کارت به کارت</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>شماره پیگیری شاپرک (RRN):</label>
+                        <input type="text" id="rrn" placeholder="شماره پیگیری روی قبض پوز">
+                    </div>
+                    <div class="form-group">
+                        <label>شماره قبض دسته‌رسید کاغذی:</label>
+                        <input type="text" id="receipt_no" placeholder="شماره سریال برگه فیش">
+                    </div>
+                    <div class="form-group">
+                        <label>توضیحات (اختیاری):</label>
+                        <input type="text" id="note" placeholder="مثلاً: بابت تسویه مرداد ماه">
+                    </div>
+                    <button type="submit" class="btn-submit">ثبت و ادامه</button>
+                </form>
+            </div>
+        </div>
+
     </div>
 
     <!-- پاپ‌آپ تایید نهایی -->
@@ -118,17 +153,24 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvRvMICYcbtkWAQVJ1a8InqZyFUpwzOfIg4KsdfJd0bA9wT2q81McNBmsyyoeaAc19qA/exec";
+
         function checkAuth() {
-    const u = document.getElementById('userInput').value.trim();
-    const p = document.getElementById('passInput').value.trim();
-    if (u === "anvari1405" && p === "9126143") {
-        sessionStorage.setItem('mahestan_form_auth', 'ok');
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('mainFormCard').style.display = 'block';
-    } else {
-        alert("نام کاربری یا رمز عبور اشتباه است.");
-    }
-}
+            const u = document.getElementById('userInput').value.trim();
+            const p = document.getElementById('passInput').value.trim();
+            if (u === "anvari1405" && p === "9126143") {
+                sessionStorage.setItem('mahestan_form_auth', 'ok');
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainFormCard').style.display = 'block';
+            } else {
+                alert("نام کاربری یا رمز عبور اشتباه است.");
+            }
+        }
+
+        if (sessionStorage.getItem('mahestan_form_auth') === 'ok') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainFormCard').style.display = 'block';
+        }
+
         function showConfirmModal() {
             document.getElementById('sumUnit').innerText = document.getElementById('unit_id').value;
             document.getElementById('sumType').innerText = document.getElementById('charge_type').value;
