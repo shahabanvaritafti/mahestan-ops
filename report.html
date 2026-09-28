@@ -18,12 +18,9 @@
         }
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, sans-serif; }
         body { background: var(--bg); color: var(--text-main); margin: 0; padding: 22px 12px; min-height: 100vh; }
-        .container { max-width: 900px; margin: auto; }
+        .container { max-width: 980px; margin: auto; }
 
-        /* صفحه ورود / لاگین */
-        #loginScreen {
-            display: flex; align-items: center; justify-content: center; min-height: 80vh;
-        }
+        #loginScreen { display: flex; align-items: center; justify-content: center; min-height: 80vh; }
         .login-card {
             background: var(--card); border: 1px solid var(--border); border-radius: 22px;
             padding: 30px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
@@ -35,10 +32,9 @@
         }
         .login-btn {
             width: 100%; background: var(--accent); color: #061517; border: none; padding: 12px;
-            border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: opacity .2s;
+            border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer;
         }
 
-        /* سوئیچ بالای صفحه */
         .switch-wrapper {
             display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px;
             background: #101c1e; padding: 8px 18px; border-radius: 40px; width: fit-content;
@@ -65,6 +61,11 @@
         .show-all-btn {
             background: transparent; border: 1px dashed var(--border); color: var(--text-dim); padding: 9px 14px; border-radius: 12px; font-size: 12px; cursor: pointer;
         }
+        .export-btn {
+            background: #14352a; border: 1px solid var(--success); color: var(--success); padding: 9px 16px;
+            border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; transition: all .2s;
+        }
+        .export-btn:hover { background: var(--success); color: #000; }
 
         .calendar-popover {
             position: absolute; top: 54px; right: 0; z-index: 100; background: #0f1c1f; border: 1px solid var(--border);
@@ -101,7 +102,6 @@
 <body>
     <div class="container">
         
-        <!-- صفحه لاگین -->
         <div id="loginScreen">
             <div class="login-card">
                 <div class="login-title">ورود به سیستم گزارشات مهستان</div>
@@ -111,7 +111,6 @@
             </div>
         </div>
 
-        <!-- صفحه اصلی بعد از لاگین -->
         <div id="mainDashboard" style="display: none;">
             <div class="switch-wrapper">
                 <span class="switch-label active" id="label-acc" onclick="setMode(false)">گزارش حسابداری</span>
@@ -126,7 +125,6 @@
 
             <div id="content" style="display: none;">
                 
-                <!-- گزارش حسابداری -->
                 <div id="accView" class="view-section active">
                     <div class="card">
                         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">انتخاب روز مغایرت‌گیری:</div>
@@ -136,6 +134,7 @@
                                 <span id="selectedDateText">---</span>
                             </button>
                             <button class="show-all-btn" onclick="showAllTransactions()">نمایش کل فیش‌ها</button>
+                            <button class="export-btn" onclick="exportToExcel()">📥 دانلود اکسل حسابداری</button>
 
                             <div class="calendar-popover" id="calendarPopover">
                                 <div class="cal-header">
@@ -152,7 +151,7 @@
                                 <div class="stat-value" id="todayPos" style="color: var(--accent);">۰ تومان</div>
                             </div>
                             <div class="stat-box">
-                                <div class="stat-title">جمع واریز شبا</div>
+                                <div class="stat-title">جمع واریز شبا / کارت</div>
                                 <div class="stat-value" id="todayShaba" style="color: #67e8f9;">۰ تومان</div>
                             </div>
                             <div class="stat-box">
@@ -161,17 +160,20 @@
                             </div>
                         </div>
 
+                        <!-- جدول دقیقا بر اساس ستون‌های عکس حسابداری -->
                         <div class="table-wrap">
                             <table>
                                 <thead>
                                     <tr>
+                                        <th>ردیف</th>
+                                        <th>شماره واحد</th>
+                                        <th>بابت</th>
+                                        <th>نوع تراکنش</th>
                                         <th>تاریخ</th>
-                                        <th>پلاک</th>
-                                        <th>نوع شارژ / شرح</th>
-                                        <th>مبلغ (تومان)</th>
-                                        <th>روش پرداخت</th>
-                                        <th>پیگیری شاپرک</th>
-                                        <th>قبض</th>
+                                        <th>مبلغ دریافتی (تومان)</th>
+                                        <th>شماره قبض رسید</th>
+                                        <th>عنوان واریز کننده</th>
+                                        <th>توضیحات</th>
                                     </tr>
                                 </thead>
                                 <tbody id="dailyTableBody"></tbody>
@@ -180,11 +182,10 @@
                     </div>
                 </div>
 
-                <!-- مرور مدیریتی -->
                 <div id="mgrView" class="view-section">
                     <div class="card">
                         <label style="font-size: 13px; color: var(--text-dim); display: block; margin-bottom: 8px;">جست‌وجوی پلاک واحد:</label>
-                        <input type="text" id="unitSearch" class="search-input" placeholder="مثلاً: 110 یا 240 یا A-14..." oninput="searchUnit()">
+                        <input type="text" id="unitSearch" class="search-input" placeholder="مثلاً: 259 یا 220..." oninput="searchUnit()">
                         
                         <div id="unitResult" style="margin-top: 20px; display: none;">
                             <div class="stat-grid">
@@ -206,16 +207,17 @@
                                 </div>
                             </div>
 
-                            <div style="font-size: 13px; color: var(--text-dim); margin: 18px 4px 8px;">ریز پرداخت‌های ثبت‌شده:</div>
+                            <div style="font-size: 13px; color: var(--text-dim); margin: 18px 4px 8px;">سوابق واریزی این پلاک:</div>
                             <div class="table-wrap">
                                 <table>
                                     <thead>
                                         <tr>
                                             <th>تاریخ</th>
-                                            <th>نوع شارژ</th>
+                                            <th>بابت</th>
+                                            <th>نوع تراکنش</th>
                                             <th>مبلغ (تومان)</th>
-                                            <th>پیگیری شاپرک</th>
-                                            <th>قبض</th>
+                                            <th>شماره قبض</th>
+                                            <th>عنوان واریز کننده</th>
                                         </tr>
                                     </thead>
                                     <tbody id="unitHistoryBody"></tbody>
@@ -234,15 +236,16 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxvRvMICYcbtkWAQVJ1a8InqZyFUpwzOfIg4KsdfJd0bA9wT2q81McNBmsyyoeaAc19qA/exec";
         let RAW_DATA = null;
+        let FILTERED_LIST = [];
 
         const SHAMSI_MONTHS = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-        let selectedY = 1405, selectedM = 7, selectedD = 6;
+        let selectedY = 1405, selectedM = 7, selectedD = 1;
         let isShowAll = false;
 
         function checkAuth() {
             const u = document.getElementById('userInput').value.trim();
             const p = document.getElementById('passInput').value.trim();
-            if (u === "mahestan1405" && p === "026026") {
+            if (u === "anvari1405" && p === "9126143") {
                 sessionStorage.setItem('mahestan_auth', 'ok');
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
@@ -252,7 +255,6 @@
             }
         }
 
-        // بررسی لاگین قبلی
         if (sessionStorage.getItem('mahestan_auth') === 'ok') {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainDashboard').style.display = 'block';
@@ -272,28 +274,9 @@
             return n.toString().replace(/\d/g, d => p[d]);
         }
 
-        function gregorianToJalali(gy, gm, gd) {
-            var g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-            var jy = (gy <= 1600) ? 0 : 979;
-            gy -= (gy <= 1600) ? 621 : 1600;
-            var gy2 = (gm > 2) ? (gy + 1) : gy;
-            var days = (365 * gy) + parseInt((gy2 + 3) / 4) - parseInt((gy2 + 99) / 100) + parseInt((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
-            jy += 33 * parseInt(days / 12053);
-            days %= 12053;
-            jy += 4 * parseInt(days / 1461);
-            days %= 1461;
-            jy += parseInt((days - 1) / 365);
-            if (days > 0) days = (days - 1) % 365;
-            var jm = (days < 186) ? 1 + parseInt(days / 31) : 7 + parseInt((days - 186) / 30);
-            var jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
-            return { y: jy, m: jm, d: jd };
-        }
-
         function cleanDateOnly(rawStr) {
             const str = toEn(rawStr || '').trim();
             if (!str) return null;
-
-            // فقط تاریخ خالص شمسی
             const jMatch = str.match(/(1[34]\d{2})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
             if (jMatch) {
                 return {
@@ -301,18 +284,6 @@
                     m: parseInt(jMatch[2], 10),
                     d: parseInt(jMatch[3], 10),
                     full: `${jMatch[1]}/${jMatch[2].padStart(2, '0')}/${jMatch[3].padStart(2, '0')}`
-                };
-            }
-
-            // میلادی قدیمی به شمسی
-            const gMatch = str.match(/(20\d{2})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-            if (gMatch) {
-                const j = gregorianToJalali(parseInt(gMatch[1], 10), parseInt(gMatch[2], 10), parseInt(gMatch[3], 10));
-                return {
-                    y: j.y,
-                    m: j.m,
-                    d: j.d,
-                    full: `${j.y}/${j.m.toString().padStart(2, '0')}/${j.d.toString().padStart(2, '0')}`
                 };
             }
             return null;
@@ -433,12 +404,10 @@
         }
 
         function renderDailyReport() {
-            let filtered = [];
-
             if (isShowAll) {
-                filtered = RAW_DATA.transactions || [];
+                FILTERED_LIST = RAW_DATA.transactions || [];
             } else {
-                filtered = (RAW_DATA.transactions || []).filter(t => {
+                FILTERED_LIST = (RAW_DATA.transactions || []).filter(t => {
                     return t.jalali && 
                            t.jalali.y === selectedY && 
                            t.jalali.m === selectedM && 
@@ -451,41 +420,79 @@
             const tbody = document.getElementById('dailyTableBody');
             tbody.innerHTML = '';
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">هیچ رکوردی برای این تاریخ ثبت نشده است.</td></tr>`;
+            if (FILTERED_LIST.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="empty-state">هیچ رکوردی برای این تاریخ ثبت نشده است.</td></tr>`;
                 document.getElementById('todayPos').innerText = '۰ تومان';
                 document.getElementById('todayShaba').innerText = '۰ تومان';
                 document.getElementById('todayCount').innerText = '۰ عدد';
                 return;
             }
 
-            filtered.forEach(t => {
-                const methodStr = String(t.method || '');
+            FILTERED_LIST.forEach((t, idx) => {
+                const methodStr = String(t.method || '').toLowerCase();
                 const amt = Number(t.amount || 0);
-                if (methodStr.includes('کارتخوان') || methodStr.includes('POS')) {
+                if (methodStr.includes('pos')) {
                     posSum += amt;
                 } else {
                     shabaSum += amt;
                 }
 
                 let displayDate = t.jalali ? toFa(t.jalali.full) : t.date;
-                const desc = t.sub ? `${t.type} (${t.sub})` : t.type;
                 tbody.innerHTML += `
                     <tr>
-                        <td style="color:var(--text-dim); font-size:12px;">${displayDate}</td>
+                        <td style="color:var(--text-muted);">${toFa(idx + 1)}</td>
                         <td style="font-weight:700; color:#fff;">${t.unit}</td>
-                        <td>${desc}</td>
-                        <td style="font-weight:700; color:var(--accent);">${amt.toLocaleString('fa-IR')}</td>
+                        <td>${t.type}</td>
                         <td>${t.method}</td>
-                        <td><small style="letter-spacing:0.5px;">${t.rrn}</small></td>
+                        <td style="color:var(--text-dim);">${displayDate}</td>
+                        <td style="font-weight:700; color:var(--accent);">${amt.toLocaleString('fa-IR')}</td>
                         <td>${t.receipt || '-'}</td>
+                        <td>${t.payer || '-'}</td>
+                        <td>${t.note || '-'}</td>
                     </tr>
                 `;
             });
 
             document.getElementById('todayPos').innerText = posSum.toLocaleString('fa-IR') + ' تومان';
             document.getElementById('todayShaba').innerText = shabaSum.toLocaleString('fa-IR') + ' تومان';
-            document.getElementById('todayCount').innerText = filtered.length.toLocaleString('fa-IR') + ' عدد';
+            document.getElementById('todayCount').innerText = FILTERED_LIST.length.toLocaleString('fa-IR') + ' عدد';
+        }
+
+        // خروجی استاندارد فایل اکسل دقیقاً با سرستون‌های اکسل مرکز خرید مهستان
+        function exportToExcel() {
+            if (!FILTERED_LIST || FILTERED_LIST.length === 0) {
+                alert("هیچ رکوردی برای خروجی اکسل وجود ندارد.");
+                return;
+            }
+
+            let csvContent = "\uFEFF"; // هدر UTF-8
+            csvContent += "ردیف,شماره واحد,بابت,نوع تراکنش,تاریخ,مبلغ دریافتی,شماره قبض رسید,عنوان واریز کننده,توضیحات\n";
+
+            FILTERED_LIST.forEach((t, idx) => {
+                let dateStr = t.jalali ? t.jalali.full : t.date;
+                let row = [
+                    idx + 1,
+                    `"${t.unit}"`,
+                    `"${t.type}"`,
+                    `"${t.method}"`,
+                    `"${dateStr}"`,
+                    t.amount,
+                    `"${t.receipt || ''}"`,
+                    `"${t.payer || ''}"`,
+                    `"${t.note || ''}"`
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            const fileName = isShowAll ? "گزارش_کل_واریزیها.csv" : `گزارش_واریزی_${selectedY}_${selectedM}_${selectedD}.csv`;
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function searchUnit() {
@@ -500,7 +507,6 @@
             }
 
             const queryEn = toEn(rawQuery).toLowerCase();
-
             let info = null;
             if (RAW_DATA.ledgers) {
                 for (const [key, val] of Object.entries(RAW_DATA.ledgers)) {
@@ -542,20 +548,20 @@
             
             if (unitTx.length > 0) {
                 unitTx.forEach(t => {
-                    const desc = t.sub ? `${t.type} (${t.sub})` : t.type;
                     let displayDate = t.jalali ? toFa(t.jalali.full) : t.date;
                     historyBody.innerHTML += `
                         <tr>
                             <td>${displayDate}</td>
-                            <td>${desc}</td>
+                            <td>${t.type}</td>
+                            <td>${t.method}</td>
                             <td style="color:var(--accent); font-weight:bold;">${Number(t.amount).toLocaleString('fa-IR')}</td>
-                            <td><small>${t.rrn}</small></td>
                             <td>${t.receipt || '-'}</td>
+                            <td>${t.payer || '-'}</td>
                         </tr>
                     `;
                 });
             } else {
-                historyBody.innerHTML = `<tr><td colspan="5" class="empty-state">هنوز هیچ فیش پرداختی برای این پلاک ثبت نشده است.</td></tr>`;
+                historyBody.innerHTML = `<tr><td colspan="6" class="empty-state">هنوز هیچ فیش پرداختی برای این پلاک ثبت نشده است.</td></tr>`;
             }
         }
     </script>
