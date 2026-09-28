@@ -118,7 +118,17 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvRvMICYcbtkWAQVJ1a8InqZyFUpwzOfIg4KsdfJd0bA9wT2q81McNBmsyyoeaAc19qA/exec";
-
+        function checkAuth() {
+    const u = document.getElementById('userInput').value.trim();
+    const p = document.getElementById('passInput').value.trim();
+    if (u === "anvari1405" && p === "9126143") {
+        sessionStorage.setItem('mahestan_form_auth', 'ok');
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainFormCard').style.display = 'block';
+    } else {
+        alert("نام کاربری یا رمز عبور اشتباه است.");
+    }
+}
         function showConfirmModal() {
             document.getElementById('sumUnit').innerText = document.getElementById('unit_id').value;
             document.getElementById('sumType').innerText = document.getElementById('charge_type').value;
