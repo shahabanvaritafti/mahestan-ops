@@ -18,7 +18,7 @@
         }
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, sans-serif; }
         body { background: var(--bg); color: var(--text-main); margin: 0; padding: 22px 12px; min-height: 100vh; }
-        .container { max-width: 980px; margin: auto; }
+        .container { max-width: 1000px; margin: auto; }
 
         #loginScreen { display: flex; align-items: center; justify-content: center; min-height: 80vh; }
         .login-card {
@@ -83,10 +83,11 @@
         }
         .day-cell.selected { background: var(--accent); color: #061214; font-weight: 800; border-color: var(--accent); }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        /* گرید چهارکارت آماری */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 20px; }
         .stat-box { background: #0b1517; border: 1px solid var(--border); padding: 14px; border-radius: 14px; text-align: center; }
         .stat-title { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
-        .stat-value { font-size: 18px; font-weight: 800; color: #fff; }
+        .stat-value { font-size: 17px; font-weight: 800; color: #fff; }
 
         .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: right; background: #0c1719; }
@@ -145,14 +146,19 @@
                             </div>
                         </div>
 
+                        <!-- کارت‌های تجمیعی ۴ گانه با واحد ریال -->
                         <div class="stat-grid">
                             <div class="stat-box">
                                 <div class="stat-title">جمع کارتخوان (POS)</div>
-                                <div class="stat-value" id="todayPos" style="color: var(--accent);">۰ تومان</div>
+                                <div class="stat-value" id="todayPos" style="color: var(--accent);">۰ ریال</div>
                             </div>
                             <div class="stat-box">
                                 <div class="stat-title">جمع واریز شبا / کارت</div>
-                                <div class="stat-value" id="todayShaba" style="color: #67e8f9;">۰ تومان</div>
+                                <div class="stat-value" id="todayShaba" style="color: #67e8f9;">۰ ریال</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-title">جمع چک</div>
+                                <div class="stat-value" id="todayCheque" style="color: #facc15;">۰ ریال</div>
                             </div>
                             <div class="stat-box">
                                 <div class="stat-title">تعداد کل فیش‌ها</div>
@@ -160,7 +166,6 @@
                             </div>
                         </div>
 
-                        <!-- جدول دقیقا بر اساس ستون‌های عکس حسابداری -->
                         <div class="table-wrap">
                             <table>
                                 <thead>
@@ -170,7 +175,7 @@
                                         <th>بابت</th>
                                         <th>نوع تراکنش</th>
                                         <th>تاریخ</th>
-                                        <th>مبلغ دریافتی (تومان)</th>
+                                        <th>مبلغ دریافتی (ریال)</th>
                                         <th>شماره قبض رسید</th>
                                         <th>عنوان واریز کننده</th>
                                         <th>توضیحات</th>
@@ -215,7 +220,7 @@
                                             <th>تاریخ</th>
                                             <th>بابت</th>
                                             <th>نوع تراکنش</th>
-                                            <th>مبلغ (تومان)</th>
+                                            <th>مبلغ (ریال)</th>
                                             <th>شماره قبض</th>
                                             <th>عنوان واریز کننده</th>
                                         </tr>
@@ -417,13 +422,15 @@
             
             let posSum = 0;
             let shabaSum = 0;
+            let chequeSum = 0;
             const tbody = document.getElementById('dailyTableBody');
             tbody.innerHTML = '';
 
             if (FILTERED_LIST.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="9" class="empty-state">هیچ رکوردی برای این تاریخ ثبت نشده است.</td></tr>`;
-                document.getElementById('todayPos').innerText = '۰ تومان';
-                document.getElementById('todayShaba').innerText = '۰ تومان';
+                document.getElementById('todayPos').innerText = '۰ ریال';
+                document.getElementById('todayShaba').innerText = '۰ ریال';
+                document.getElementById('todayCheque').innerText = '۰ ریال';
                 document.getElementById('todayCount').innerText = '۰ عدد';
                 return;
             }
@@ -431,7 +438,10 @@
             FILTERED_LIST.forEach((t, idx) => {
                 const methodStr = String(t.method || '').toLowerCase();
                 const amt = Number(t.amount || 0);
-                if (methodStr.includes('pos')) {
+
+                if (methodStr.includes('چک')) {
+                    chequeSum += amt;
+                } else if (methodStr.includes('pos')) {
                     posSum += amt;
                 } else {
                     shabaSum += amt;
@@ -453,19 +463,19 @@
                 `;
             });
 
-            document.getElementById('todayPos').innerText = posSum.toLocaleString('fa-IR') + ' تومان';
-            document.getElementById('todayShaba').innerText = shabaSum.toLocaleString('fa-IR') + ' تومان';
+            document.getElementById('todayPos').innerText = posSum.toLocaleString('fa-IR') + ' ریال';
+            document.getElementById('todayShaba').innerText = shabaSum.toLocaleString('fa-IR') + ' ریال';
+            document.getElementById('todayCheque').innerText = chequeSum.toLocaleString('fa-IR') + ' ریال';
             document.getElementById('todayCount').innerText = FILTERED_LIST.length.toLocaleString('fa-IR') + ' عدد';
         }
 
-        // خروجی استاندارد فایل اکسل دقیقاً با سرستون‌های اکسل مرکز خرید مهستان
         function exportToExcel() {
             if (!FILTERED_LIST || FILTERED_LIST.length === 0) {
                 alert("هیچ رکوردی برای خروجی اکسل وجود ندارد.");
                 return;
             }
 
-            let csvContent = "\uFEFF"; // هدر UTF-8
+            let csvContent = "\uFEFF";
             csvContent += "ردیف,شماره واحد,بابت,نوع تراکنش,تاریخ,مبلغ دریافتی,شماره قبض رسید,عنوان واریز کننده,توضیحات\n";
 
             FILTERED_LIST.forEach((t, idx) => {
@@ -532,14 +542,14 @@
 
             if (info) {
                 document.getElementById('resName').innerText = info.name || '-';
-                document.getElementById('resDemand').innerText = Number(info.totalDemand).toLocaleString('fa-IR') + ' تومان';
-                document.getElementById('resPaid').innerText = Number(info.totalPaid).toLocaleString('fa-IR') + ' تومان';
-                document.getElementById('resBalance').innerText = Number(info.balance).toLocaleString('fa-IR') + ' تومان';
+                document.getElementById('resDemand').innerText = Number(info.totalDemand).toLocaleString('fa-IR') + ' ریال';
+                document.getElementById('resPaid').innerText = Number(info.totalPaid).toLocaleString('fa-IR') + ' ریال';
+                document.getElementById('resBalance').innerText = Number(info.balance).toLocaleString('fa-IR') + ' ریال';
             } else {
                 const totalPaidCalc = unitTx.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
                 document.getElementById('resName').innerText = 'واحد جدید (ثبت‌نشده در پایه)';
                 document.getElementById('resDemand').innerText = 'نامشخص';
-                document.getElementById('resPaid').innerText = totalPaidCalc.toLocaleString('fa-IR') + ' تومان';
+                document.getElementById('resPaid').innerText = totalPaidCalc.toLocaleString('fa-IR') + ' ریال';
                 document.getElementById('resBalance').innerText = 'نامشخص';
             }
 
