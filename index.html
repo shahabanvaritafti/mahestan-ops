@@ -36,7 +36,7 @@
 
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         h2 { font-size: 18px; margin-top: 0; margin-bottom: 20px; text-align: center; color: var(--accent); }
-        .form-group { margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; position: relative; }
         label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
         input, select {
             width: 100%; background: #0b1517; border: 1px solid var(--border); color: #fff;
@@ -49,6 +49,30 @@
         }
         .btn-submit:active { transform: scale(0.98); }
 
+        /* ویجت تقویم تاریخ ثبت */
+        .date-trigger-btn {
+            width: 100%; background: #0b1517; border: 1px solid var(--border); color: #fff;
+            padding: 12px 14px; border-radius: 12px; font-size: 14px; font-weight: 600;
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all .2s;
+        }
+        .date-trigger-btn:hover { border-color: var(--accent); }
+        .calendar-popover {
+            position: absolute; top: 72px; right: 0; left: 0; z-index: 100;
+            background: #0f1c1f; border: 1px solid var(--border); border-radius: 18px;
+            padding: 16px; box-shadow: 0 14px 40px rgba(0,0,0,0.6); display: none;
+        }
+        .calendar-popover.open { display: block; animation: popIn .2s ease-out; }
+        @keyframes popIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        .cal-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        .cal-select { background: #081113; border: 1px solid var(--border); color: #fff; padding: 6px 10px; border-radius: 10px; font-size: 13px; outline: none; width: 48%; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .day-cell {
+            background: #142427; border: 1px solid var(--border); border-radius: 10px; height: 36px;
+            display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #d1e7ea; cursor: pointer;
+        }
+        .day-cell.selected { background: var(--accent); color: #061214; font-weight: 800; border-color: var(--accent); }
+
+        /* پاپ‌آپ مودال تایید */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.75); backdrop-filter: blur(5px);
@@ -90,7 +114,7 @@
                         <input type="text" id="unit_id" required placeholder="مثال: 259 یا 232">
                     </div>
 
-                    <!-- ۲. بابت (کرکره‌ای دست‌نخورده) -->
+                    <!-- ۲. بابت -->
                     <div class="form-group">
                         <label>بابت:</label>
                         <select id="charge_type">
@@ -101,38 +125,55 @@
                         </select>
                     </div>
 
-                    <!-- ۳. نوع تراکنش (کرکره‌ای دست‌نخورده) -->
+                    <!-- ۳. نوع تراکنش (افزوده شدن گزینه چک) -->
                     <div class="form-group">
                         <label>نوع تراکنش:</label>
                         <select id="pay_method">
-                            <option value="pos">pos</option>
-                            <option value="شبا">شبا</option>
+                            <option value="pos">pos (کارتخوان)</option>
+                            <option value="شبا">شبا (ساتنا / پایا)</option>
                             <option value="کارت به کارت">کارت به کارت</option>
+                            <option value="چک">چک</option>
                         </select>
                     </div>
 
-                    <!-- ۴. مبلغ دریافتی -->
+                    <!-- ۴. تاریخ ثبت فیش (تقویم بازشو برای روزهای قبل) -->
                     <div class="form-group">
-                        <label>مبلغ دریافتی (تومان):</label>
-                        <input type="number" id="amount" required placeholder="مثال: 23963000">
+                        <label>تاریخ ثبت فیش:</label>
+                        <button type="button" class="date-trigger-btn" onclick="toggleCalendar(event)">
+                            <span id="selectedDateText">---</span>
+                            <span>📅</span>
+                        </button>
+                        <div class="calendar-popover" id="calendarPopover">
+                            <div class="cal-header">
+                                <select id="calMonthSelect" class="cal-select" onchange="renderDaysGrid()"></select>
+                                <select id="calYearSelect" class="cal-select" onchange="renderDaysGrid()"></select>
+                            </div>
+                            <div class="days-grid" id="daysGrid"></div>
+                        </div>
                     </div>
 
-                    <!-- ۵. شماره قبض رسید -->
+                    <!-- ۵. مبلغ دریافتی -->
+                    <div class="form-group">
+                        <label>مبلغ دریافتی (ریال):</label>
+                        <input type="number" id="amount" required placeholder="مبلغ به ریال">
+                    </div>
+
+                    <!-- ۶. شماره قبض رسید -->
                     <div class="form-group">
                         <label>شماره قبض رسید:</label>
                         <input type="text" id="receipt_no" placeholder="مثال: 33543">
                     </div>
 
-                    <!-- ۶. عنوان واریز کننده -->
+                    <!-- ۷. عنوان واریز کننده -->
                     <div class="form-group">
                         <label>عنوان واریز کننده:</label>
                         <input type="text" id="payer_name" placeholder="مثال: طالبی، رضاقلی...">
                     </div>
 
-                    <!-- ۷. توضیحات -->
+                    <!-- ۸. توضیحات -->
                     <div class="form-group">
                         <label>توضیحات (اختیاری):</label>
-                        <input type="text" id="note" placeholder="یادداشت در صورت نیاز">
+                        <input type="text" id="note" placeholder="مثلاً: بابت تسویه دوره قبل یا مشخصات صیادی چک">
                     </div>
 
                     <button type="submit" class="btn-submit">ثبت و مشاهده تاییدیه</button>
@@ -142,13 +183,14 @@
 
     </div>
 
-    <!-- پاپ‌آپ مودال تایید -->
+    <!-- مودال تایید نهایی -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-card">
             <div class="modal-title">بررسی و تایید نهایی فیش</div>
             <div class="summary-row"><span class="summary-label">شماره واحد:</span><span class="summary-val" id="sumUnit">-</span></div>
             <div class="summary-row"><span class="summary-label">بابت:</span><span class="summary-val" id="sumType">-</span></div>
             <div class="summary-row"><span class="summary-label">نوع تراکنش:</span><span class="summary-val" id="sumMethod">-</span></div>
+            <div class="summary-row"><span class="summary-label">تاریخ انتخابی:</span><span class="summary-val" id="sumDate">-</span></div>
             <div class="summary-row"><span class="summary-label">مبلغ دریافتی:</span><span class="summary-val" id="sumAmount" style="color:var(--accent);">-</span></div>
             <div class="summary-row"><span class="summary-label">شماره قبض رسید:</span><span class="summary-val" id="sumReceipt">-</span></div>
             <div class="summary-row"><span class="summary-label">عنوان واریز کننده:</span><span class="summary-val" id="sumPayer">-</span></div>
@@ -164,6 +206,98 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvRvMICYcbtkWAQVJ1a8InqZyFUpwzOfIg4KsdfJd0bA9wT2q81McNBmsyyoeaAc19qA/exec";
 
+        const SHAMSI_MONTHS = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+        let selYear = 1405, selMonth = 7, selDay = 1;
+
+        function toFa(n) {
+            const p = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+            return n.toString().replace(/\d/g, d => p[d]);
+        }
+
+        // تبدیل میلادی مرورگر به شمسی برای تعیین اولیه امروز
+        function setTodayJalali() {
+            var now = new Date();
+            var gy = now.getFullYear(), gm = now.getMonth() + 1, gd = now.getDate();
+            var g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+            var jy = (gy <= 1600) ? 0 : 979;
+            gy -= (gy <= 1600) ? 621 : 1600;
+            var gy2 = (gm > 2) ? (gy + 1) : gy;
+            var days = (365 * gy) + parseInt((gy2 + 3) / 4) - parseInt((gy2 + 99) / 100) + parseInt((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+            jy += 33 * parseInt(days / 12053);
+            days %= 12053;
+            jy += 4 * parseInt(days / 1461);
+            days %= 1461;
+            jy += parseInt((days - 1) / 365);
+            if (days > 0) days = (days - 1) % 365;
+            var jm = (days < 186) ? 1 + parseInt(days / 31) : 7 + parseInt((days - 186) / 30);
+            var jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+            selYear = jy; selMonth = jm; selDay = jd;
+        }
+
+        function initCalendar() {
+            setTodayJalali();
+            const mSel = document.getElementById('calMonthSelect');
+            mSel.innerHTML = '';
+            SHAMSI_MONTHS.forEach((name, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx + 1;
+                opt.innerText = name;
+                if (idx + 1 === selMonth) opt.selected = true;
+                mSel.appendChild(opt);
+            });
+
+            const ySel = document.getElementById('calYearSelect');
+            ySel.innerHTML = '';
+            for (let y = 1403; y <= 1408; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.innerText = toFa(y);
+                if (y === selYear) opt.selected = true;
+                ySel.appendChild(opt);
+            }
+            updateDateTriggerText();
+        }
+
+        function toggleCalendar(e) {
+            e.stopPropagation();
+            const pop = document.getElementById('calendarPopover');
+            pop.classList.toggle('open');
+            if (pop.classList.contains('open')) renderDaysGrid();
+        }
+
+        document.addEventListener('click', function(e) {
+            const pop = document.getElementById('calendarPopover');
+            if (pop && !pop.contains(e.target) && !e.target.closest('.date-trigger-btn')) {
+                pop.classList.remove('open');
+            }
+        });
+
+        function renderDaysGrid() {
+            const m = parseInt(document.getElementById('calMonthSelect').value, 10);
+            const y = parseInt(document.getElementById('calYearSelect').value, 10);
+            const grid = document.getElementById('daysGrid');
+            grid.innerHTML = '';
+            const totalDays = (m <= 6) ? 31 : (m <= 11 ? 30 : 29);
+
+            for (let d = 1; d <= totalDays; d++) {
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+                if (d === selDay && m === selMonth && y === selYear) cell.classList.add('selected');
+                cell.innerText = toFa(d);
+                cell.onclick = (ev) => {
+                    ev.stopPropagation();
+                    selYear = y; selMonth = m; selDay = d;
+                    document.getElementById('calendarPopover').classList.remove('open');
+                    updateDateTriggerText();
+                };
+                grid.appendChild(cell);
+            }
+        }
+
+        function updateDateTriggerText() {
+            document.getElementById('selectedDateText').innerText = `${toFa(selDay)} ${SHAMSI_MONTHS[selMonth - 1]} ${toFa(selYear)}`;
+        }
+
         function checkAuth() {
             const u = document.getElementById('userInput').value.trim();
             const p = document.getElementById('passInput').value.trim();
@@ -171,6 +305,7 @@
                 sessionStorage.setItem('mahestan_form_auth', 'ok');
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainFormCard').style.display = 'block';
+                initCalendar();
             } else {
                 alert("نام کاربری یا رمز عبور اشتباه است.");
             }
@@ -179,13 +314,21 @@
         if (sessionStorage.getItem('mahestan_form_auth') === 'ok') {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainFormCard').style.display = 'block';
+            window.addEventListener('DOMContentLoaded', initCalendar);
+        }
+
+        function getFormattedSelectedDate() {
+            const mStr = selMonth.toString().padStart(2, '0');
+            const dStr = selDay.toString().padStart(2, '0');
+            return `${selYear}/${mStr}/${dStr}`;
         }
 
         function showConfirmModal() {
             document.getElementById('sumUnit').innerText = document.getElementById('unit_id').value;
             document.getElementById('sumType').innerText = document.getElementById('charge_type').value;
             document.getElementById('sumMethod').innerText = document.getElementById('pay_method').value;
-            document.getElementById('sumAmount').innerText = Number(document.getElementById('amount').value).toLocaleString('fa-IR') + ' تومان';
+            document.getElementById('sumDate').innerText = toFa(getFormattedSelectedDate());
+            document.getElementById('sumAmount').innerText = Number(document.getElementById('amount').value).toLocaleString('fa-IR') + ' ریال';
             document.getElementById('sumReceipt').innerText = document.getElementById('receipt_no').value || '-';
             document.getElementById('sumPayer').innerText = document.getElementById('payer_name').value || '-';
             document.getElementById('sumNote').innerText = document.getElementById('note').value || '-';
@@ -206,6 +349,7 @@
                 unit_id: document.getElementById('unit_id').value,
                 charge_type: document.getElementById('charge_type').value,
                 pay_method: document.getElementById('pay_method').value,
+                entry_date: getFormattedSelectedDate(), // ارسال تاریخ شمسی تعیین‌شده توسط کاربر
                 amount: Number(document.getElementById('amount').value),
                 receipt_no: document.getElementById('receipt_no').value,
                 payer_name: document.getElementById('payer_name').value,
@@ -219,8 +363,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                alert("تراکنش با موفقیت ثبت شد.");
+                alert("تراکنش با موفقیت در تاریخ " + toFa(payload.entry_date) + " ثبت شد.");
                 document.getElementById('txForm').reset();
+                initCalendar();
                 closeConfirmModal();
             } catch (err) {
                 alert("خطا در ارسال اطلاعات.");
